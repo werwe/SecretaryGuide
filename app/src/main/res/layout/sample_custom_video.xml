@@ -1,0 +1,31 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <VideoView
+        android:id="@+id/second_videoview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <kr.co.starmark.secretaryguide.HalfClippingLayout
+        android:id="@+id/cliplayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <kr.co.starmark.secretaryguide.VideoView
+            android:id="@+id/first_videoview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+
+    </kr.co.starmark.secretaryguide.HalfClippingLayout>
+
+    <Button
+        android:id="@+id/clip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_margin="8dp"
+        android:text="clip" />
+</FrameLayout>
