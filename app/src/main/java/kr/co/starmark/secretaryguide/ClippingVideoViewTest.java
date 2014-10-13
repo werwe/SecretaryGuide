@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.VideoView;
 
 import butterknife.ButterKnife;
@@ -22,7 +21,7 @@ public class ClippingVideoViewTest extends Activity {
     @InjectView(R.id.second_videoview)
     VideoView mSecondVideoview;
     @InjectView(R.id.cliplayout)
-    HalfClippingLayout mCliplayout;
+    ClippingLayout mCliplayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +38,6 @@ public class ClippingVideoViewTest extends Activity {
     @OnClick(R.id.clip)
     public void clip() {
         Log.d("ClippingVideoViewTest", "Clipping toggle");
-        mCliplayout.toggleHalf();
+//        mCliplayout.toggleHalf();
     }
 }

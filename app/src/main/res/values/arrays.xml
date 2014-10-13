@@ -1,0 +1,7 @@
+<resources>
+    <string-array name="nav">
+        <item >@string/standard</item>
+        <item >@string/ffc</item>
+    </string-array>
+
+</resources>

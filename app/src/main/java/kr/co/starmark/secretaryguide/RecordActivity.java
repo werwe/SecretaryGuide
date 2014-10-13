@@ -17,7 +17,7 @@ import android.widget.Button;
 import java.io.File;
 import java.io.IOException;
 
-
+@Deprecated
 public class RecordActivity extends Activity implements TextureView.SurfaceTextureListener , MediaRecorder.OnInfoListener , MediaRecorder.OnErrorListener{
 
     public static final String LOGTAG = "VIDEOCAPTURE";
@@ -84,7 +84,7 @@ public class RecordActivity extends Activity implements TextureView.SurfaceTextu
 
     public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
         Log.d(LOGTAG, "width:" + width + "/" + height);
-        // Ignored, CameraDemoFragment does all the work for us
+        // Ignored, SecrataryCameraFragment does all the work for us
     }
 
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
@@ -94,7 +94,7 @@ public class RecordActivity extends Activity implements TextureView.SurfaceTextu
     }
 
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        // Invoked every time there's a new CameraDemoFragment preview frame
+        // Invoked every time there's a new SecrataryCameraFragment preview frame
     }
     //texture view initialize sequence
 
