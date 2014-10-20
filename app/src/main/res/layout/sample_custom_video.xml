@@ -3,23 +3,23 @@
     android:layout_height="match_parent">
 
 
-    <VideoView
-        android:id="@+id/second_videoview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <!--<VideoView-->
+    <!--android:id="@+id/second_videoview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
 
-    <kr.co.starmark.secretaryguide.ClippingLayout
-        android:id="@+id/cliplayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <!--<kr.co.starmark.secretaryguide.ClippingLayout-->
+    <!--android:id="@+id/cliplayout"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
 
-        <kr.co.starmark.secretaryguide.VideoView
-            android:id="@+id/first_videoview"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+    <!--<kr.co.starmark.secretaryguide.VideoView-->
+    <!--android:id="@+id/first_videoview"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent" />-->
 
 
-    </kr.co.starmark.secretaryguide.ClippingLayout>
+    <!--</kr.co.starmark.secretaryguide.ClippingLayout>-->
 
     <Button
         android:id="@+id/clip"
@@ -28,4 +28,26 @@
         android:layout_gravity="left|bottom"
         android:layout_margin="8dp"
         android:text="clip" />
+
+    <LinearLayout
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <kr.co.starmark.secretaryguide.VideoView
+            android:id="@+id/first_videoview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5" />
+
+        <VideoView
+            android:id="@+id/second_videoview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.5"
+
+            />
+
+    </LinearLayout>
 </FrameLayout>

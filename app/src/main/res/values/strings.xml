@@ -20,5 +20,7 @@
     <string name="flash">Flash</string>
     <string name="launch_full_screen">Launch Full-Screen</string>
     <string name="mirror_ffc">Mirror FFC</string>
+    <string name="title_activity_compare">CompareActivity</string>
+    <string name="title_activity_splash">SplashActivity</string>
 
 </resources>

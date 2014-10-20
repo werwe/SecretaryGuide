@@ -1,232 +1,163 @@
 package kr.co.starmark.secretaryguide;
 
+import android.app.ActionBar;
 import android.app.Activity;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.graphics.SurfaceTexture;
-import android.hardware.Camera;
-import android.media.CamcorderProfile;
-import android.media.MediaRecorder;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.TextureView;
+import android.text.format.DateFormat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 
-@Deprecated
-public class RecordActivity extends Activity implements TextureView.SurfaceTextureListener , MediaRecorder.OnInfoListener , MediaRecorder.OnErrorListener{
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
-    public static final String LOGTAG = "VIDEOCAPTURE";
+public class RecordActivity extends Activity implements CameraFragment.RecordCallback, RadioGroup.OnCheckedChangeListener {
 
-    private MediaRecorder recorder;
-    private CamcorderProfile camcorderProfile;
+    final Logger logger = LoggerFactory.getLogger(RecordActivity.class);
+    public static final String TAG = "RecordActivity";
 
-    private Camera mCamera;
-    private TextureView mTextureView;
-    private Button mTakeVideo;
-    boolean mRecording = false;
-    boolean mUseCamera = true;
-    boolean mPreviewRunning = false;
+    GreetingVideo record;
+    int greetingType = 1; // 1 , 2 , 3
+    int faceSide = 1;
 
+    CameraFragment mCameraFragment;
+    @InjectView(R.id.menu)
+    RadioGroup mMenu;
+    @InjectView(R.id.container)
+    FrameLayout mContainer;
+    @InjectView(R.id.switch_camera_face)
+    ImageButton mSwitchCameraFace;
+    @InjectView(R.id.switch_face)
+    ImageButton mSwitchFace;
 
-    int mCameraCount;
-    int mSelectedCamera = 0;
+    int mCheckedID = R.id.greeting1;
+
+    @InjectView(R.id.greeting1)
+    RadioButton mGreeting1;
+    @InjectView(R.id.greeting2)
+    RadioButton mGreeting2;
+    @InjectView(R.id.greeting3)
+    RadioButton mGreeting3;
+    @InjectView(R.id.side)
+    TextView mSide;
+
+    @InjectView(R.id.left)
+    Button mLeft;
+    @InjectView(R.id.title)
+    TextView mTitle;
+    @InjectView(R.id.right)
+    ImageButton mRight;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
-        if(!checkCameraHardware(getApplicationContext()))
-        {
-            //이용가능한 카메라가 없다.
-            finish();
-        }
+        setActionBar();
+        mCameraFragment = CameraFragment.newInstance();
+        mCameraFragment.setRecordCallback(this);
+        getFragmentManager().beginTransaction().replace(R.id.container, mCameraFragment).commit();
+        ButterKnife.inject(this);
 
-        mTextureView = (TextureView) findViewById(R.id.textureview);
-        mTextureView.setSurfaceTextureListener(this);
-        camcorderProfile = CamcorderProfile.get(CamcorderProfile.QUALITY_1080P);
-        mTakeVideo = (Button) findViewById(R.id.takevideo);
-        mTakeVideo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                recordVideo();
-            }
-        });
-
-        findViewById(R.id.switchbtn).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                switchCamera();
-            }
-        });
-
-        mCameraCount = Camera.getNumberOfCameras();
-
+        mMenu.check(mCheckedID);
+        mMenu.setOnCheckedChangeListener(this);
     }
 
+    private void setActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.actionbar);
+        ButterKnife.inject(actionBar.getCustomView());
+//        mTitle.setText("Secretary Guide");
+    }
 
-    //Texture View initialize sequence
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-        mCamera = Camera.open();
-        mCamera.setDisplayOrientation(90);
-
+    public void recordVideo(View v) {
         try {
-            mCamera.setPreviewTexture(surface);
-            mCamera.startPreview();
-            prepareRecorder(mSelectedCamera);
-        } catch (IOException ioe) {
-            // Something bad happened
-        }
-    }
-
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        Log.d(LOGTAG, "width:" + width + "/" + height);
-        // Ignored, SecrataryCameraFragment does all the work for us
-    }
-
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        mCamera.stopPreview();
-        mCamera.release();
-        return true;
-    }
-
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        // Invoked every time there's a new SecrataryCameraFragment preview frame
-    }
-    //texture view initialize sequence
-
-
-    private void prepareRecorder(int cameraId) {
-        if(recorder == null)
-            recorder = new MediaRecorder();
-
-        if (mUseCamera) {
-            mCamera.unlock();
-            recorder.setCamera(mCamera);
-        }
-        recorder.setOnInfoListener(this);
-        recorder.setOnErrorListener(this);
-
-        recorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-        recorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
-
-        camcorderProfile = CamcorderProfile.get(cameraId, CamcorderProfile.QUALITY_HIGH);
-
-        recorder.setProfile(camcorderProfile);
-
-        // This is all very sloppy
-        if (camcorderProfile.fileFormat == MediaRecorder.OutputFormat.THREE_GPP) {
-            try {
-                File newFile = File.createTempFile("videocapture", ".3gp", Environment.getExternalStorageDirectory());
-                recorder.setOutputFile(newFile.getAbsolutePath());
-            } catch (IOException e) {
-                Log.v(LOGTAG,"Couldn't create file");
-                e.printStackTrace();
-                finish();
-            }
-        } else if (camcorderProfile.fileFormat == MediaRecorder.OutputFormat.MPEG_4) {
-            try {
-                File newFile = File.createTempFile("videocapture", ".mp4", Environment.getExternalStorageDirectory());
-                recorder.setOutputFile(newFile.getAbsolutePath());
-            } catch (IOException e) {
-                Log.v(LOGTAG,"Couldn't create file");
-                e.printStackTrace();
-                finish();
-            }
-        } else {
-            try {
-                File newFile = File.createTempFile("videocapture", ".mp4", Environment.getExternalStorageDirectory());
-                recorder.setOutputFile(newFile.getAbsolutePath());
-            } catch (IOException e) {
-                Log.v(LOGTAG, "Couldn't create file");
-                e.printStackTrace();
-                finish();
-            }
-        }
-        //recorder.setMaxDuration(50000); // 50 seconds
-        //recorder.setMaxFileSize(5000000); // Approximately 5 megabytes
-
-        try {
-            recorder.prepare();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-            finish();
+            if (mCameraFragment.isRecording())
+                mCameraFragment.stopRecording();
+            else
+                mCameraFragment.record();
         } catch (IOException e) {
             e.printStackTrace();
-            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-    private void recordVideo()
-    {
-        if (mRecording) {
-            recorder.stop();
-            if (mUseCamera) {
-                try {
-                    mCamera.reconnect();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            // recorder.release();
-            mRecording = false;
-            Log.v(LOGTAG, "Recording Stopped");
-            // Let's prepareRecorder so we can record again
-            prepareRecorder(mSelectedCamera);
-        } else {
-            mRecording = true;
-            recorder.start();
-            Log.v(LOGTAG, "Recording Started");
-        }
+    public void switchCamera(View v) {
+        mCameraFragment.switchCamera();
     }
 
-    private void switchCamera()
-    {
-        if(mSelectedCamera == 0)
-            mSelectedCamera = 1;
+    public void switchFace(View view) {
+        if(faceSide == 1)
+            faceSide = 2;
         else
-            mSelectedCamera = 0;
+            faceSide = 1;
 
-        Log.d(LOGTAG, "selected camera:" + mSelectedCamera);
-        mCamera.lock();
-        mCamera.stopPreview();
-        mCamera.release();
-        mCamera = Camera.open(mSelectedCamera);
-        mCamera.setDisplayOrientation(90);
-
-        try {
-            mCamera.setPreviewTexture(mTextureView.getSurfaceTexture());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        mCamera.startPreview();
-
-        recorder.reset();
-        prepareRecorder(mSelectedCamera);
-    }
-
-    /** Check if this device has a camera */
-    private boolean checkCameraHardware(Context context) {
-        if (context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)){
-            // this device has a camera
-            return true;
-        } else {
-            // no camera on this device
-            return false;
-        }
+        if(faceSide == 1)
+            mSide.setText("앞 모습");
+        else if(faceSide == 2)
+            mSide.setText("옆 모습");
     }
 
     @Override
-    public void onInfo(MediaRecorder mediaRecorder, int i, int i2) {
-        Log.d(LOGTAG, "OnInfo:" + i + "/" + i2);
+    protected void onDestroy() {
+        super.onDestroy();
+        ButterKnife.reset(this);
+    }
+
+    @OnClick(R.id.left)
+    public void onActionBarLeft() {
+        logger.debug("actionbar left button");
+    }
+
+    @OnClick(R.id.right)
+    public void onActionBarRight() {
+        MenuDialogFragment dialog = MenuDialogFragment.newInstance(0);
+        FragmentTransaction ft = getFragmentManager().beginTransaction();
+        dialog.show(ft, "dialog");
     }
 
     @Override
-    public void onError(MediaRecorder mediaRecorder, int i, int i2) {
-        Log.d(LOGTAG, "OnError:" + i + "/" + i2);
+    public void onRecordStart(File videoPath) {
+        mSwitchCameraFace.setEnabled(false);
+        record = new GreetingVideo();
+        record.path = videoPath.getAbsolutePath();
+        record.type = greetingType;
+        record.side = faceSide;
+        record.date = DateFormat.format("yyyy-MM-dd-hh-mm-ss", Calendar.getInstance()).toString();
+        record.log();
+        record.save();
+    }
+
+    @Override
+    public void onRecordStop() {
+        mSwitchCameraFace.setEnabled(true);
+        Intent intent = new Intent(getApplicationContext(),CompareActivity.class);
+        intent.putExtra("record", record);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onCheckedChanged(RadioGroup radioGroup, int i) {
+        mCheckedID = i;
+        if (mCheckedID == R.id.greeting1)
+            greetingType = 1;
+        else if (mCheckedID == R.id.greeting2)
+            greetingType = 2;
+        else if (mCheckedID == R.id.greeting3)
+            greetingType = 3;
     }
 }

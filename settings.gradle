@@ -1,3 +1,2 @@
-include ':app', ':camera'
+include ':app'
 
-project(':camera').projectDir = new File('camera/camera')

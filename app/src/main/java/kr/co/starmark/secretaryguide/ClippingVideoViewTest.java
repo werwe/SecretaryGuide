@@ -20,8 +20,8 @@ public class ClippingVideoViewTest extends Activity {
     kr.co.starmark.secretaryguide.VideoView mFirstVideoview;
     @InjectView(R.id.second_videoview)
     VideoView mSecondVideoview;
-    @InjectView(R.id.cliplayout)
-    ClippingLayout mCliplayout;
+//    @InjectView(R.id.cliplayout)
+//    ClippingLayout mCliplayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +29,13 @@ public class ClippingVideoViewTest extends Activity {
         setContentView(R.layout.sample_custom_video);
         ButterKnife.inject(this);
 
-        mFirstVideoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/raw/doiwannaknow"));
+        mFirstVideoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_sample_1_1"));
         mFirstVideoview.start();
-        mSecondVideoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/raw/midnight_city"));
+        mSecondVideoview.setVideoURI(Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_sample_1_2"));
         mSecondVideoview.start();
     }
 
-    @OnClick(R.id.clip)
+//    @OnClick(R.id.clip)
     public void clip() {
         Log.d("ClippingVideoViewTest", "Clipping toggle");
 //        mCliplayout.toggleHalf();
