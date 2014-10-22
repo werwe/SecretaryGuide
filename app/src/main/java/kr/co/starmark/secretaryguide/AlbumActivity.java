@@ -1,24 +1,19 @@
 package kr.co.starmark.secretaryguide;
 
 import android.app.Activity;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.activeandroid.query.Select;
+
+import org.lucasr.twowayview.ItemClickSupport;
+import org.lucasr.twowayview.widget.TwoWayView;
 
 import java.util.List;
 
@@ -32,19 +27,36 @@ public class AlbumActivity extends Activity {
     List<GreetingVideo> mRecords;
 
     @InjectView(R.id.list)
-    ListView mList;
+    TwoWayView mRecyclerView;
+
     @InjectView(R.id.progress)
     ProgressBar mProgress;
     @InjectView(R.id.progressContainer)
     LinearLayout mProgressContainer;
 
-    AlbumAdapter mAdapter;
+    LayoutAdapter mAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
         ButterKnife.inject(this);
+        setRecyclerView();
+        mRecyclerView.setHasFixedSize(true);
         queryData();
+    }
+
+    private void setRecyclerView() {
+        final ItemClickSupport itemclick = ItemClickSupport.addTo(mRecyclerView);
+        itemclick.setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
+            @Override
+            public void onItemClick(RecyclerView parent, View view, int position, long id) {
+                GreetingVideo video = mAdapter.getItem(position);
+                Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
+                intent.putExtra("record", video);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -64,124 +76,11 @@ public class AlbumActivity extends Activity {
             @Override
             protected void onPostExecute(Void aVoid) {
                 mProgressContainer.setVisibility(View.GONE);
-                if(mRecords == null || mRecords.isEmpty()); //비어있는 화면
-                mAdapter = new AlbumAdapter(getApplicationContext());
-                mList.setAdapter(mAdapter);
+                if (mRecords == null || mRecords.isEmpty()) ; //비어있는 화면
+                mAdapter = new LayoutAdapter(AlbumActivity.this, mRecyclerView, mRecords);
+                mRecyclerView.setAdapter(mAdapter);
                 Log.d(TAG, "Records:" + mRecords.size());
             }
         }.execute();
-    }
-
-    class AlbumAdapter extends BaseAdapter {
-
-        LayoutInflater mInflater;
-
-        public AlbumAdapter(Context context) {
-            mInflater = LayoutInflater.from(context);
-        }
-
-        @Override
-        public int getCount() {
-            return mRecords.size();
-        }
-
-        @Override
-        public GreetingVideo getItem(int i) {
-            return mRecords.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            VideoRecordItem holder = null;
-            if (view == null) {
-                view = mInflater.inflate(R.layout.album_listitem, null);
-                view.setTag(holder = new VideoRecordItem(view));
-            } else
-                holder = (VideoRecordItem) view.getTag();
-
-            holder.setItem(getItem(i));
-            return view;
-        }
-    }
-
-    static class VideoRecordItem {
-
-        @InjectView(R.id.thumbnail)
-        ImageView mThumbnail;
-        @InjectView(R.id.title)
-        TextView mTitle;
-        @InjectView(R.id.date)
-        TextView mDate;
-
-        VideoRecordItem(View view) {
-            ButterKnife.inject(this, view);
-        }
-
-        public ImageView getThumbnail() {
-            return mThumbnail;
-        }
-
-        public void setThumbnail(ImageView thumbnail) {
-            mThumbnail = thumbnail;
-        }
-
-        public TextView getTitle() {
-            return mTitle;
-        }
-
-        public void setTitle(TextView title) {
-            mTitle = title;
-        }
-
-        public TextView getDate() {
-            return mDate;
-        }
-
-        public void setDate(TextView date) {
-            mDate = date;
-        }
-
-        public void setItem(GreetingVideo item) {
-            mTitle.setText(getGreetingType(item.type)+" - "+getfaceSide(item.side));
-            mDate.setText(item.date);
-            new AsyncTask<String,Void,Bitmap>(){
-                @Override
-                protected Bitmap doInBackground(String... path) {
-                    return ThumbnailUtils.createVideoThumbnail(path[0],MediaStore.Images.Thumbnails.MICRO_KIND);
-                }
-
-                @Override
-                protected void onPostExecute(Bitmap bitmap) {
-                    mThumbnail.setImageBitmap(bitmap);
-                }
-            }.execute(item.path);
-        }
-
-        private String getfaceSide(int side) {
-            switch (side) {
-                case 1:
-                    return "앞 모습";
-                case 2:
-                    return "옆 모습";
-            }
-            return "";
-        }
-
-        private String getGreetingType(int type) {
-            switch (type) {
-                case 1:
-                    return "가벼운 인사";
-                case 2:
-                    return "보통 인사";
-                case 3:
-                    return "정중한 인사";
-            }
-            return "";
-        }
     }
 }

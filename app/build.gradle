@@ -8,6 +8,11 @@ repositories {
     maven {
         url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
+
+    repositories {
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+
 }
 android {
     compileSdkVersion 20
@@ -35,4 +40,8 @@ dependencies {
     compile 'org.slf4j:slf4j-android:1.7.7'
     compile 'com.michaelpardo:activeandroid:3.1.0-SNAPSHOT'
     compile 'com.android.support:support-v4:20.0.0'
+    compile project(':core')
+    compile project(':layouts')
+    compile 'com.android.support:support-v4:21.0.0'
+    compile 'com.viewpagerindicator:library:2.4.1'
 }

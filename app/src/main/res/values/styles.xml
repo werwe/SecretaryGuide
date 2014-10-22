@@ -13,4 +13,12 @@
         <!--<item name="android:customNavigationLayout">@layout/actionbar</item>-->
     <!--</style>-->
 
+    <style name="TwoWayViewBase">
+        <item name="android:background">@android:color/white</item>
+    </style>
+
+    <style name="TwoWayView" parent="TwoWayViewBase">
+        <item name="android:orientation">vertical</item>
+        <item name="android:scrollbars">vertical</item>
+    </style>
 </resources>

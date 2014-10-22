@@ -1,113 +1,146 @@
 package kr.co.starmark.secretaryguide;
 
-public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.SimpleViewHolder> {
-    private static final int COUNT = 100;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.os.AsyncTask;
+import android.provider.MediaStore;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import org.lucasr.twowayview.widget.TwoWayView;
+
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+
+public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecordItem> {
     private final Context mContext;
     private final TwoWayView mRecyclerView;
-    private final List<Integer> mItems;
-    private final int mLayoutId;
+    private List<GreetingVideo> mRecords;
     private int mCurrentItemId = 0;
 
-    public static class SimpleViewHolder extends RecyclerView.ViewHolder {
-        public final TextView title;
+    public static class VideoRecordItem extends RecyclerView.ViewHolder {
 
-        public SimpleViewHolder(View view) {
+        @InjectView(R.id.thumbnail)
+        ImageView mThumbnail;
+        @InjectView(R.id.title)
+        TextView mTitle;
+        @InjectView(R.id.date)
+        TextView mDate;
+
+        VideoRecordItem(View view) {
             super(view);
-            title = (TextView) view.findViewById(R.id.title);
+            ButterKnife.inject(this, view);
+        }
+
+        public ImageView getThumbnail() {
+            return mThumbnail;
+        }
+
+        public void setThumbnail(ImageView thumbnail) {
+            mThumbnail = thumbnail;
+        }
+
+        public TextView getTitle() {
+            return mTitle;
+        }
+
+        public void setTitle(TextView title) {
+            mTitle = title;
+        }
+
+        public TextView getDate() {
+            return mDate;
+        }
+
+        public void setDate(TextView date) {
+            mDate = date;
+        }
+
+        public void setItem(GreetingVideo item) {
+            mTitle.setText(getGreetingType(item.type) + " - " + getfaceSide(item.side));
+            mDate.setText(item.date);
+            new AsyncTask<String, Void, Bitmap>() {
+                @Override
+                protected Bitmap doInBackground(String... path) {
+                    return ThumbnailUtils.createVideoThumbnail(path[0], MediaStore.Images.Thumbnails.MINI_KIND);
+                }
+
+                @Override
+                protected void onPostExecute(Bitmap bitmap) {
+                    mThumbnail.setImageBitmap(bitmap);
+                }
+            }.execute(item.path);
+        }
+
+        private String getfaceSide(int side) {
+            switch (side) {
+                case 1:
+                    return "앞 모습";
+                case 2:
+                    return "옆 모습";
+            }
+            return "";
+        }
+
+        private String getGreetingType(int type) {
+            switch (type) {
+                case 1:
+                    return "가벼운 인사";
+                case 2:
+                    return "보통 인사";
+                case 3:
+                    return "정중한 인사";
+            }
+            return "";
         }
     }
 
-    public LayoutAdapter(Context context, TwoWayView recyclerView, int layoutId) {
+    public LayoutAdapter(Context context, TwoWayView recyclerView, List<GreetingVideo> datas) {
         mContext = context;
-        mItems = new ArrayList<Integer>(COUNT);
-        for (int i = 0; i < COUNT; i++) {
-            addItem(i);
-        }
-
+        mRecords = datas;
         mRecyclerView = recyclerView;
-        mLayoutId = layoutId;
     }
 
-    public void addItem(int position) {
-        final int id = mCurrentItemId++;
-        mItems.add(position, id);
+    public void addItem(int position, GreetingVideo item) {
+        mRecords.add(position, item);
         notifyItemInserted(position);
     }
 
     public void removeItem(int position) {
-        mItems.remove(position);
+        mRecords.remove(position);
         notifyItemRemoved(position);
     }
 
-    @Override
-    public SimpleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        final View view = LayoutInflater.from(mContext).inflate(R.layout.item, parent, false);
-        return new SimpleViewHolder(view);
+    public void removeItem(GreetingVideo item) {
+        int index = mRecords.indexOf(item);
+        mRecords.remove(index);
+        notifyItemRemoved(index);
     }
 
-    @Override
-    public void onBindViewHolder(SimpleViewHolder holder, int position) {
-        holder.title.setText(mItems.get(position).toString());
-
-        boolean isVertical = (mRecyclerView.getOrientation() == TwoWayLayoutManager.Orientation.VERTICAL);
-        final View itemView = holder.itemView;
-
-        final int itemId = mItems.get(position);
-
-        if (mLayoutId == R.layout.layout_staggered_grid) {
-            final int dimenId;
-            if (itemId % 3 == 0) {
-                dimenId = R.dimen.staggered_child_medium;
-            } else if (itemId % 5 == 0) {
-                dimenId = R.dimen.staggered_child_large;
-            } else if (itemId % 7 == 0) {
-                dimenId = R.dimen.staggered_child_xlarge;
-            } else {
-                dimenId = R.dimen.staggered_child_small;
-            }
-
-            final int span;
-            if (itemId == 2) {
-                span = 2;
-            } else {
-                span = 1;
-            }
-
-            final int size = mContext.getResources().getDimensionPixelSize(dimenId);
-
-            final StaggeredGridLayoutManager.LayoutParams lp =
-                    (StaggeredGridLayoutManager.LayoutParams) itemView.getLayoutParams();
-
-            if (!isVertical) {
-                lp.span = span;
-                lp.width = size;
-                itemView.setLayoutParams(lp);
-            } else {
-                lp.span = span;
-                lp.height = size;
-                itemView.setLayoutParams(lp);
-            }
-        } else if (mLayoutId == R.layout.layout_spannable_grid) {
-            final SpannableGridLayoutManager.LayoutParams lp =
-                    (SpannableGridLayoutManager.LayoutParams) itemView.getLayoutParams();
-
-            final int span1 = (itemId == 0 || itemId == 3 ? 2 : 1);
-            final int span2 = (itemId == 0 ? 2 : (itemId == 3 ? 3 : 1));
-
-            final int colSpan = (isVertical ? span2 : span1);
-            final int rowSpan = (isVertical ? span1 : span2);
-
-            if (lp.rowSpan != rowSpan || lp.colSpan != colSpan) {
-                lp.rowSpan = rowSpan;
-                lp.colSpan = colSpan;
-                itemView.setLayoutParams(lp);
-            }
-        }
+    public GreetingVideo getItem(int position) {
+        return mRecords.get(position);
     }
 
     @Override
     public int getItemCount() {
-        return mItems.size();
+        return mRecords.size();
+    }
+
+    @Override
+    public VideoRecordItem onCreateViewHolder(ViewGroup parent, int viewType) {
+        final View view = LayoutInflater.from(mContext).inflate(R.layout.album_listitem, parent, false);
+        return new VideoRecordItem(view);
+    }
+
+    @Override
+    public void onBindViewHolder(VideoRecordItem holder, int position) {
+        holder.setItem(getItem(position));
     }
 }

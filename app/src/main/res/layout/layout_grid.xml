@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TwoWayView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent">
-
-</TwoWayView>
+<org.lucasr.twowayview.widget.TwoWayView xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+android:id="@+id/list"
+style="@style/TwoWayView"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+app:twowayview_layoutManager="GridLayoutManager"
+app:twowayview_numColumns="2"
+app:twowayview_numRows="2" />

@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/SecretaryGuide.iml" filepath="$PROJECT_DIR$/SecretaryGuide.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/twoway-view/core/core.iml" filepath="$PROJECT_DIR$/twoway-view/core/core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/twoway-view/layouts/layouts.iml" filepath="$PROJECT_DIR$/twoway-view/layouts/layouts.iml" />
     </modules>
   </component>
 </project>

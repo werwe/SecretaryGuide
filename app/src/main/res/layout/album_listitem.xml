@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
-    android:padding="8dp">
+    android:layout_height="160dp"
+    android:padding="4dp">
 
     <ImageView
         android:id="@+id/thumbnail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_centerVertical="true"
+        android:scaleType="fitXY"
         android:src="@drawable/ic_launcher" />
 
     <TextView
-        android:layout_marginLeft="16dp"
         android:id="@+id/title"
         style="@android:style/TextAppearance.DeviceDefault.Medium"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@id/thumbnail"
+        android:layout_above="@+id/date"
+        android:background="#33ff"
         android:text="가벼운 인사 - 앞모습" />
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
+        android:layout_alignParentBottom="true"
+        android:background="#33ff"
         android:text="2014년 10월 20일" />
 
 </RelativeLayout>

@@ -133,6 +133,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
     @Override
     public void onRecordStart(File videoPath) {
+
         mSwitchCameraFace.setEnabled(false);
         mRecord = new GreetingVideo();
         mRecord.path = videoPath.getAbsolutePath();
