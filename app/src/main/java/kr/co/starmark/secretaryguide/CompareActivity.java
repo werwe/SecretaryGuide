@@ -121,7 +121,6 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
             mV1IsPlaying = false;
             if(!mV2IsPlaying)
                 mPlay.setVisibility(View.VISIBLE);
-
         }
     };
 

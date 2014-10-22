@@ -29,10 +29,11 @@ import java.util.List;
 import butterknife.ButterKnife;
 
 
-public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener ,Camera.AutoFocusCallback{
-    
-    public static interface RecordCallback{
+public class CameraFragment extends Fragment implements TextureView.SurfaceTextureListener, Camera.AutoFocusCallback {
+
+    public static interface RecordCallback {
         public void onRecordStart(File videoPath);
+
         public void onRecordStop();
     }
 
@@ -90,13 +91,13 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK)
                 mBackCameraID = i;
         }
-        if(mBackCameraID != -1)
+        if (mBackCameraID != -1)
             mCameraID = mBackCameraID;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mPreviewContainer = (PreviewFrameLayout)inflater.inflate(R.layout.camera_fragment, container, false);
+        mPreviewContainer = (PreviewFrameLayout) inflater.inflate(R.layout.camera_fragment, container, false);
         mTextureView = ButterKnife.findById(mPreviewContainer, R.id.textureview);
         mTextureView.setSurfaceTextureListener(this);
         return mPreviewContainer;
@@ -118,7 +119,9 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
     }
 
     @Override
-    public void onDestroy() { super.onDestroy(); }
+    public void onDestroy() {
+        super.onDestroy();
+    }
 
     /// TextureView.SurfaceTextureListener Callback
     @Override
@@ -127,7 +130,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 //        Log.d(TAG, String.format("onSurfaceTextureAvailable:%s,%s", width, height));
         openCamera();
         getVideoPreviewSize();
-        mPreviewContainer.setPreviewSize(mPreviewWidth,mPreviewHeight);
+        mPreviewContainer.setPreviewSize(mPreviewWidth, mPreviewHeight);
         startPreview();
     }
 
@@ -136,14 +139,14 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 //        Log.d(TAG, String.format("onSurfaceTextureSizeChanged:%s,%s", width, height));
 //        logger.debug("onSurfaceTextureSizeChanged:{},{}", width, height);
 //        getVideoPreviewSize();
-        mPreviewContainer.setPreviewSize(mPreviewWidth,mPreviewHeight);
+        mPreviewContainer.setPreviewSize(mPreviewWidth, mPreviewHeight);
     }
 
     @Override
     public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
         mCamera.stopPreview();
         mCamera.release();
-        if(mRecorder != null)
+        if (mRecorder != null)
             mRecorder.release();
 
         return true;
@@ -157,13 +160,12 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
 
     /**
-     *
      * @param b
      * @param camera
      */
     @Override
     public void onAutoFocus(boolean b, Camera camera) {
-        if(b) {
+        if (b) {
             Toast.makeText(getActivity(), "auto focused", Toast.LENGTH_SHORT).show();
         }
     }
@@ -188,7 +190,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             Camera.Parameters params = mCamera.getParameters();
             getVideoPreviewSize();
 
-            if(mCameraID == mBackCameraID) {
+            if (mCameraID == mBackCameraID) {
                 params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
             }
             params.setRotation(90);
@@ -218,18 +220,17 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
 
         openCamera();
 
-        Camera.Size size = mCamera.getParameters().getPreviewSize();
-        Log.d(TAG, "size(" + size.width + "/" + size.height);
+//        Camera.Size size = mCamera.getParameters().getPreviewSize();
+//        Log.d(TAG, "size(" + size.width + "/" + size.height);
         startPreview();
 
     }
 
-    public boolean isRecording()
-    {
+    public boolean isRecording() {
         return mIsRecording;
     }
 
-    public void record ()throws Exception {
+    public void record() throws Exception {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
             throw new UnsupportedOperationException(
                     "Video recording supported only on API Level 11+");
@@ -243,15 +244,19 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
             mRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
-
             mProfile = CamcorderProfile.get(mCameraID, CamcorderProfile.QUALITY_720P);
-            mRecorder.setProfile(mProfile);
 
+            mRecorder.setProfile(mProfile);
+//            mRecorder.setOutputFormat(mProfile.fileFormat);
+//            mRecorder.setVideoEncoder(mProfile.videoCodec);
+//            mRecorder.setVideoEncodingBitRate(mProfile.videoBitRate);
+//            mRecorder.setVideoFrameRate(mProfile.videoFrameRate);
+//            mRecorder.setVideoSize(mProfile.videoFrameWidth,mProfile.videoFrameHeight);
             // This is all very sloppy
             File newFile = null;
             if (mProfile.fileFormat == MediaRecorder.OutputFormat.THREE_GPP) {
                 try {
-                    newFile = File.createTempFile("video-"+System.currentTimeMillis(), ".3gp", getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
+                    newFile = File.createTempFile("video-" + System.currentTimeMillis(), ".3gp", getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
                     mRecorder.setOutputFile(newFile.getAbsolutePath());
                 } catch (IOException e) {
                     Log.v(TAG, "Couldn't create file");
@@ -259,7 +264,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 }
             } else if (mProfile.fileFormat == MediaRecorder.OutputFormat.MPEG_4) {
                 try {
-                    newFile = File.createTempFile("video-"+System.currentTimeMillis(), ".mp4", getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
+                    newFile = File.createTempFile("video-" + System.currentTimeMillis(), ".mp4", getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
                     mRecorder.setOutputFile(newFile.getAbsolutePath());
                 } catch (IOException e) {
                     Log.v(TAG, "Couldn't create file");
@@ -267,7 +272,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 }
             } else {
                 try {
-                    newFile = File.createTempFile("video-"+System.currentTimeMillis(), ".mp4", getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
+                    newFile = File.createTempFile("video-" + System.currentTimeMillis(), ".mp4", getActivity().getExternalFilesDir(Environment.DIRECTORY_MOVIES));
                     mRecorder.setOutputFile(newFile.getAbsolutePath());
                 } catch (IOException e) {
                     Log.v(TAG, "Couldn't create file");

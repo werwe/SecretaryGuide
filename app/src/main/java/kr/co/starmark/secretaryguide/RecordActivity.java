@@ -30,9 +30,9 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     final Logger logger = LoggerFactory.getLogger(RecordActivity.class);
     public static final String TAG = "RecordActivity";
 
-    GreetingVideo record;
-    int greetingType = 1; // 1 , 2 , 3
-    int faceSide = 1;
+    GreetingVideo mRecord;
+    int mGreetingType = 1; // 1 , 2 , 3
+    int mFaceSide = 1; // 1 , 2
 
     CameraFragment mCameraFragment;
     @InjectView(R.id.menu)
@@ -70,7 +70,6 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         mCameraFragment.setRecordCallback(this);
         getFragmentManager().beginTransaction().replace(R.id.container, mCameraFragment).commit();
         ButterKnife.inject(this);
-
         mMenu.check(mCheckedID);
         mMenu.setOnCheckedChangeListener(this);
     }
@@ -101,14 +100,14 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     }
 
     public void switchFace(View view) {
-        if(faceSide == 1)
-            faceSide = 2;
+        if(mFaceSide == 1)
+            mFaceSide = 2;
         else
-            faceSide = 1;
+            mFaceSide = 1;
 
-        if(faceSide == 1)
+        if(mFaceSide == 1)
             mSide.setText("앞 모습");
-        else if(faceSide == 2)
+        else if(mFaceSide == 2)
             mSide.setText("옆 모습");
     }
 
@@ -125,28 +124,30 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
     @OnClick(R.id.right)
     public void onActionBarRight() {
-        MenuDialogFragment dialog = MenuDialogFragment.newInstance(0);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        dialog.show(ft, "dialog");
+//        MenuDialogFragment dialog = MenuDialogFragment.newInstance(0);
+//        FragmentTransaction ft = getFragmentManager().beginTransaction();
+//        dialog.show(ft, "dialog");
+        Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
+        startActivity(intent);
     }
 
     @Override
     public void onRecordStart(File videoPath) {
         mSwitchCameraFace.setEnabled(false);
-        record = new GreetingVideo();
-        record.path = videoPath.getAbsolutePath();
-        record.type = greetingType;
-        record.side = faceSide;
-        record.date = DateFormat.format("yyyy-MM-dd-hh-mm-ss", Calendar.getInstance()).toString();
-        record.log();
-        record.save();
+        mRecord = new GreetingVideo();
+        mRecord.path = videoPath.getAbsolutePath();
+        mRecord.type = mGreetingType;
+        mRecord.side = mFaceSide;
+        mRecord.date = DateFormat.format("yyyy-MM-dd-hh-mm-ss", Calendar.getInstance()).toString();
+        mRecord.log();
+        mRecord.save();
     }
 
     @Override
     public void onRecordStop() {
         mSwitchCameraFace.setEnabled(true);
         Intent intent = new Intent(getApplicationContext(),CompareActivity.class);
-        intent.putExtra("record", record);
+        intent.putExtra("record", mRecord);
         startActivity(intent);
     }
 
@@ -154,10 +155,10 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     public void onCheckedChanged(RadioGroup radioGroup, int i) {
         mCheckedID = i;
         if (mCheckedID == R.id.greeting1)
-            greetingType = 1;
+            mGreetingType = 1;
         else if (mCheckedID == R.id.greeting2)
-            greetingType = 2;
+            mGreetingType = 2;
         else if (mCheckedID == R.id.greeting3)
-            greetingType = 3;
+            mGreetingType = 3;
     }
 }

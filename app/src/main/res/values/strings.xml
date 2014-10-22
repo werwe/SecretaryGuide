@@ -22,5 +22,6 @@
     <string name="mirror_ffc">Mirror FFC</string>
     <string name="title_activity_compare">CompareActivity</string>
     <string name="title_activity_splash">SplashActivity</string>
+    <string name="title_activity_album">AlbumActivity</string>
 
 </resources>

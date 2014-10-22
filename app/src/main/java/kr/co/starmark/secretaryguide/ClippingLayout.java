@@ -6,10 +6,11 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
 import android.widget.VideoView;
 
 
-public class ClippingLayout extends FrameLayout {
+public class ClippingLayout extends RelativeLayout {
 
     public static final int CLIPPING_FULL = 0;
     public static final int CLIPPING_HALF = 2;
