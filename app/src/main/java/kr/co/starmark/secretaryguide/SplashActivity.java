@@ -13,7 +13,7 @@ public class SplashActivity extends Activity {
     private Runnable mStartAct = new Runnable() {
         @Override
         public void run() {
-            startActivity(new Intent(getApplicationContext(), RecordActivity.class));
+            startActivity(new Intent(getApplicationContext(), GuideActivity.class));
             overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
             finish();
         }
