@@ -7,3 +7,5 @@
 
 .idea
 .idea/*
+app/app.iml
+*.iml
