@@ -11,20 +11,25 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 
+import com.melnykov.fab.FloatingActionButton;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class GuideActivity extends FragmentActivity {
+public class GuideActivity extends FragmentActivity implements ViewPager.OnPageChangeListener{
 
     final Logger logger = LoggerFactory.getLogger(GuideActivity.class);
     public static final String TAG = "RecordActivity";
@@ -47,13 +52,20 @@ public class GuideActivity extends FragmentActivity {
     @InjectView(R.id.right)
     ImageButton mRight;
 
+    @InjectView(R.id.start_video_recorder)
+    FloatingActionButton mStartVideoRecorder;
+    private SampleFragmentPagerAdapter mPagerAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_guide);
         setActionBar();
         ButterKnife.inject(this);
-        mPager.setAdapter(new SampleFragmentPagerAdapter());
+        mPagerAdapter = new SampleFragmentPagerAdapter();
+        mPager.setAdapter(mPagerAdapter);
+        mPager.setOffscreenPageLimit(5);
+        mPager.setOnPageChangeListener(this);
         mPagerHeader.setGravity(Gravity.CENTER);
         mPagerHeader.setTabIndicatorColor(Color.CYAN);
         mPagerHeader.setTextSpacing(10);
@@ -80,15 +92,50 @@ public class GuideActivity extends FragmentActivity {
 
     @OnClick(R.id.right)
     public void onActionBarRight() {
-//        MenuDialogFragment dialog = MenuDialogFragment.newInstance(0);
-//        FragmentTransaction ft = getFragmentManager().beginTransaction();
-//        dialog.show(ft, "dialog");
+
         Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.start_video_recorder)
+    public void onVideoRecoderStart()
+    {
+        Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
         startActivity(intent);
     }
 
     private Uri getVideoUri(int type, int side) {
         return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_sample_" + type + "_" + side);
+    }
+
+    @Override
+    public void onPageScrolled(int i, float v, int i2) {
+        if(i == 1)
+        {
+            Log.d(TAG, String.format("i:%d,v:%f,i2:%d",i,v,i2));
+        }
+
+    }
+
+    @Override
+    public void onPageSelected(int i) {
+        List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
+        for (Fragment f : fragmentList) {
+            if(f instanceof PageFragment)
+            {
+                PageFragment fragment =(PageFragment) f;
+                fragment.pausePlay();
+            }
+        }
+        if (i > 2)
+            mStartVideoRecorder.hide(true);
+        else
+            mStartVideoRecorder.show(true);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
     }
 
     public class SampleFragmentPagerAdapter extends FragmentPagerAdapter {
@@ -105,10 +152,17 @@ public class GuideActivity extends FragmentActivity {
 
         @Override
         public Fragment getItem(int position) {
-            return PageFragment.create(
-                    getVideoUri(mPager.getCurrentItem() + 1, 1) ,
-                    getVideoUri(mPager.getCurrentItem() + 1, 2)
-            );
+            if (position < 3) {
+                Log.d(TAG, "Position:" + (position + 1));
+                return PageFragment.create(
+                        new Uri[]{
+                                getVideoUri(position + 1, 1),
+                                getVideoUri(position + 1, 1),
+                                getVideoUri(position + 1, 2)
+                        }
+                );
+            }
+            return PageFragment.create(new Uri[]{getVideoUri(2, 1)});
         }
 
         public CharSequence getPageTitle(int position) {
@@ -117,20 +171,20 @@ public class GuideActivity extends FragmentActivity {
     }
 
     public static class PageFragment extends Fragment {
-        public static final String FRONT = "ARG_FRONT";
-        public static final String SIDE = "ARG_SIDE";
+
+        public static final String VIDEOS = "ARG_URIES";
+        private Uri[] mVideoUris;
+
         @InjectView(R.id.video)
         android.widget.VideoView mVideo;
         @InjectView(R.id.btn_play)
         ImageView mBtnPlay;
 
-        private Uri mFrontVideo;
-        private Uri mSidevideo;
+        private int mCnt = 0;
 
-        public static PageFragment create(Uri front, Uri side) {
+        public static PageFragment create(Uri[] videos) {
             Bundle args = new Bundle();
-            args.putParcelable(FRONT, front);
-            args.putParcelable(SIDE, side);
+            args.putParcelableArray(VIDEOS, videos);
             PageFragment fragment = new PageFragment();
             fragment.setArguments(args);
             return fragment;
@@ -139,8 +193,7 @@ public class GuideActivity extends FragmentActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            mFrontVideo = getArguments().getParcelable(FRONT);
-            mSidevideo = getArguments().getParcelable(SIDE);
+            mVideoUris = (Uri[]) getArguments().getParcelableArray(VIDEOS);
         }
 
         @Override
@@ -148,23 +201,59 @@ public class GuideActivity extends FragmentActivity {
                                  Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_page, container, false);
             ButterKnife.inject(this, view);
-
-            mVideo.setVideoURI(mFrontVideo);
+            mVideo.setVideoURI(mVideoUris[0]);
             mVideo.seekTo(100);
+            mVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mediaPlayer) {
+                    if (mVideoUris.length > 1 && mCnt < mVideoUris.length - 1) {
+                        mVideo.setVideoURI(mVideoUris[++mCnt]);
+                        mVideo.start();
+                    } else {
+                        mCnt = 0;
+                        mBtnPlay.setVisibility(View.VISIBLE);
+                    }
+                }
+            });
+            mVideo.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mediaPlayer, int i, int i2) {
+                    return true;
+                }
+            });
             return view;
         }
 
         @OnClick(R.id.btn_play)
-        public void play(final View view)
-        {
+        public void play(final View view) {
+            mVideo.setVideoURI(mVideoUris[mCnt]);
             mVideo.start();
             view.setVisibility(View.GONE);
-            mVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mediaPlayer) {
-                    view.setVisibility(View.VISIBLE);
-                }
-            });
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            stopPlay();
+        }
+
+        @Override
+        public void onResume()
+        {
+            super.onResume();
+            mVideo.seekTo(100);
+        }
+
+        public void stopPlay() {
+            mVideo.stopPlayback();
+            mVideo.seekTo(100);
+            mBtnPlay.setVisibility(View.VISIBLE);
+        }
+
+        public void pausePlay() {
+            mVideo.pause();
+            mVideo.seekTo(100);
+            mBtnPlay.setVisibility(View.VISIBLE);
         }
     }
 }
