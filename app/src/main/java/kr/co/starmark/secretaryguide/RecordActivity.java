@@ -1,17 +1,12 @@
 package kr.co.starmark.secretaryguide;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import org.slf4j.Logger;
@@ -23,9 +18,8 @@ import java.util.Calendar;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 
-public class RecordActivity extends Activity implements CameraFragment.RecordCallback, RadioGroup.OnCheckedChangeListener {
+public class RecordActivity extends Activity implements CameraFragment.RecordCallback {
 
     final Logger logger = LoggerFactory.getLogger(RecordActivity.class);
     public static final String TAG = "RecordActivity";
@@ -35,8 +29,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     int mFaceSide = 1; // 1 , 2
 
     CameraFragment mCameraFragment;
-    @InjectView(R.id.menu)
-    RadioGroup mMenu;
+
     @InjectView(R.id.container)
     FrameLayout mContainer;
     @InjectView(R.id.switch_camera_face)
@@ -44,42 +37,19 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     @InjectView(R.id.switch_face)
     ImageButton mSwitchFace;
 
-    int mCheckedID = R.id.greeting1;
 
-    @InjectView(R.id.greeting1)
-    RadioButton mGreeting1;
-    @InjectView(R.id.greeting2)
-    RadioButton mGreeting2;
-    @InjectView(R.id.greeting3)
-    RadioButton mGreeting3;
     @InjectView(R.id.side)
     TextView mSide;
-
-    @InjectView(R.id.left)
-    Button mLeft;
-    @InjectView(R.id.title)
-    TextView mTitle;
-    @InjectView(R.id.right)
-    ImageButton mRight;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
-        setActionBar();
+
         mCameraFragment = CameraFragment.newInstance();
         mCameraFragment.setRecordCallback(this);
         getFragmentManager().beginTransaction().replace(R.id.container, mCameraFragment).commit();
         ButterKnife.inject(this);
-        mMenu.check(mCheckedID);
-        mMenu.setOnCheckedChangeListener(this);
-    }
 
-    private void setActionBar() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-        actionBar.setCustomView(R.layout.actionbar);
-        ButterKnife.inject(actionBar.getCustomView());
-//        mTitle.setText("Secretary Guide");
     }
 
     public void recordVideo(View v) {
@@ -106,29 +76,15 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
             mFaceSide = 1;
 
         if(mFaceSide == 1)
-            mSide.setText("앞 모습");
+            mSide.setText("정면을 촬영합니다.");
         else if(mFaceSide == 2)
-            mSide.setText("옆 모습");
+            mSide.setText("측면을 촬영합니다.");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.reset(this);
-    }
-
-    @OnClick(R.id.left)
-    public void onActionBarLeft() {
-        logger.debug("actionbar left button");
-    }
-
-    @OnClick(R.id.right)
-    public void onActionBarRight() {
-//        MenuDialogFragment dialog = MenuDialogFragment.newInstance(0);
-//        FragmentTransaction ft = getFragmentManager().beginTransaction();
-//        dialog.show(ft, "dialog");
-        Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
-        startActivity(intent);
     }
 
     @Override
@@ -150,16 +106,5 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         Intent intent = new Intent(getApplicationContext(),CompareActivity.class);
         intent.putExtra("record", mRecord);
         startActivity(intent);
-    }
-
-    @Override
-    public void onCheckedChanged(RadioGroup radioGroup, int i) {
-        mCheckedID = i;
-        if (mCheckedID == R.id.greeting1)
-            mGreetingType = 1;
-        else if (mCheckedID == R.id.greeting2)
-            mGreetingType = 2;
-        else if (mCheckedID == R.id.greeting3)
-            mGreetingType = 3;
     }
 }
