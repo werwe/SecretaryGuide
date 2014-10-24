@@ -37,4 +37,6 @@ dependencies {
     compile project(':core')
     compile project(':layouts')
     compile 'com.android.support:support-v4:21.0.0'
+
+    compile 'com.melnykov:floatingactionbutton:1.0.4'
 }
