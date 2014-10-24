@@ -6,7 +6,7 @@
     <!--android:background="@android:color/black"-->
 
     <TextView
-        android:id="@+id/greeting1"
+        android:id="@+id/face_explain"
         android:layout_width="match_parent"
         android:layout_height="49dp"
         android:layout_weight="1"
@@ -22,7 +22,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/greeting1">
+        android:layout_above="@+id/seek_bar"
+        android:layout_below="@id/face_explain">
 
         <LinearLayout
             android:id="@+id/video_frame"
@@ -36,13 +37,13 @@
             <VideoView
                 android:id="@+id/leftVideo"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.5" />
 
             <VideoView
                 android:id="@+id/rightVideo"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.5" />
         </LinearLayout>
 
@@ -54,4 +55,33 @@
             android:src="@drawable/play_btn" />
     </FrameLayout>
 
+    <SeekBar
+        android:id="@+id/seek_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/controller"
+        android:layout_weight="1"
+        android:indeterminate="false" />
+
+    <LinearLayout
+        android:id="@+id/controller"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="play" />
+
+        <TextView
+            android:id="@+id/duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:text="0:00 / 0:00" />
+    </LinearLayout>
 </RelativeLayout>
