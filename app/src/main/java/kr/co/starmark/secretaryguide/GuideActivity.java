@@ -2,7 +2,9 @@ package kr.co.starmark.secretaryguide;
 
 import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import android.widget.VideoView;
 
 import com.melnykov.fab.FloatingActionButton;
 
@@ -29,7 +32,7 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-public class GuideActivity extends FragmentActivity implements ViewPager.OnPageChangeListener{
+public class GuideActivity extends FragmentActivity implements ViewPager.OnPageChangeListener {
 
     final Logger logger = LoggerFactory.getLogger(GuideActivity.class);
     public static final String TAG = "RecordActivity";
@@ -64,7 +67,6 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         ButterKnife.inject(this);
         mPagerAdapter = new SampleFragmentPagerAdapter();
         mPager.setAdapter(mPagerAdapter);
-        mPager.setOffscreenPageLimit(5);
         mPager.setOnPageChangeListener(this);
         mPagerHeader.setGravity(Gravity.CENTER);
         mPagerHeader.setTabIndicatorColor(Color.CYAN);
@@ -98,8 +100,7 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
     }
 
     @OnClick(R.id.start_video_recorder)
-    public void onVideoRecoderStart()
-    {
+    public void onVideoRecoderStart() {
         Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
         startActivity(intent);
     }
@@ -110,9 +111,8 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
     @Override
     public void onPageScrolled(int i, float v, int i2) {
-        if(i == 1)
-        {
-            Log.d(TAG, String.format("i:%d,v:%f,i2:%d",i,v,i2));
+        if (i == 1) {
+            Log.d(TAG, String.format("i:%d,v:%f,i2:%d", i, v, i2));
         }
 
     }
@@ -121,10 +121,9 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
     public void onPageSelected(int i) {
         List<Fragment> fragmentList = getSupportFragmentManager().getFragments();
         for (Fragment f : fragmentList) {
-            if(f instanceof PageFragment)
-            {
-                PageFragment fragment =(PageFragment) f;
-                fragment.pausePlay();
+            if (f instanceof PageFragment) {
+                PageFragment fragment = (PageFragment) f;
+                fragment.removeVideoView();
             }
         }
         if (i > 2)
@@ -175,10 +174,16 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         public static final String VIDEOS = "ARG_URIES";
         private Uri[] mVideoUris;
 
-        @InjectView(R.id.video)
-        android.widget.VideoView mVideo;
+        @InjectView(R.id.preview)
+        ImageView mPreview;
+
+        @InjectView(R.id.videoContainer)
+        FrameLayout mVideoContainer;
+
         @InjectView(R.id.btn_play)
         ImageView mBtnPlay;
+
+        VideoView mVideo;
 
         private int mCnt = 0;
 
@@ -201,8 +206,44 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
                                  Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_page, container, false);
             ButterKnife.inject(this, view);
+            loadPreview();
+            return view;
+        }
+
+        private void loadPreview() {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(getActivity().getApplicationContext(), mVideoUris[0]);
+            Bitmap b = retriever.getFrameAtTime();
+            mPreview.setImageBitmap(b);
+        }
+
+        private void addVideoView() {
+            mVideo = new VideoView(getActivity().getApplicationContext());
+            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mPreview.getWidth(), mPreview.getHeight());
+            params.gravity = Gravity.CENTER;
+            mVideoContainer.addView(mVideo, params);
+        }
+
+        @OnClick(R.id.btn_play)
+        public void play(final View view) {
+            Log.d(TAG, "play");
+            if (mVideo == null) {
+                addVideoView();
+            }
             mVideo.setVideoURI(mVideoUris[0]);
-            mVideo.seekTo(100);
+            mVideo.start();
+            mVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mediaPlayer) {
+                    Log.d(TAG, "onPrepared");
+                    mediaPlayer.seekTo(0);
+                    mVideo.start();
+                    view.setVisibility(View.GONE);
+                    mPreview.setVisibility(View.GONE);
+                    mVideo.setOnPreparedListener(null);
+                }
+            });
+            mVideo.setVideoURI(mVideoUris[mCnt]);
             mVideo.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mediaPlayer) {
@@ -212,6 +253,7 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
                     } else {
                         mCnt = 0;
                         mBtnPlay.setVisibility(View.VISIBLE);
+                        mPreview.setVisibility(View.VISIBLE);
                     }
                 }
             });
@@ -221,14 +263,6 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
                     return true;
                 }
             });
-            return view;
-        }
-
-        @OnClick(R.id.btn_play)
-        public void play(final View view) {
-            mVideo.setVideoURI(mVideoUris[mCnt]);
-            mVideo.start();
-            view.setVisibility(View.GONE);
         }
 
         @Override
@@ -238,22 +272,35 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         }
 
         @Override
-        public void onResume()
-        {
+        public void onResume() {
             super.onResume();
-            mVideo.seekTo(100);
+            mBtnPlay.setVisibility(View.VISIBLE);
+            mPreview.setVisibility(View.VISIBLE);
         }
 
         public void stopPlay() {
-            mVideo.stopPlayback();
-            mVideo.seekTo(100);
+            if (mVideo != null) {
+                mVideo.stopPlayback();
+                mCnt = 0;
+                mVideo.setVideoURI(mVideoUris[mCnt]);
+                mVideo.seekTo(100);
+            }
+
             mBtnPlay.setVisibility(View.VISIBLE);
+            mPreview.setVisibility(View.VISIBLE);
         }
 
-        public void pausePlay() {
-            mVideo.pause();
-            mVideo.seekTo(100);
+        public void removeVideoView() {
+            Log.d(TAG, "removeVideoView");
+            if (mVideo != null)
+                mVideo.stopPlayback();
+
             mBtnPlay.setVisibility(View.VISIBLE);
+            mPreview.setVisibility(View.VISIBLE);
+            mVideoContainer.removeAllViews();
+
+            mVideo = null;
+            mCnt = 0;
         }
     }
 }
