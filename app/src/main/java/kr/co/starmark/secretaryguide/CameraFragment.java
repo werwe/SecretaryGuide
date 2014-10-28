@@ -236,17 +236,42 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                     "Video recording supported only on API Level 11+");
         }
 
+        //rotation
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(mCameraID, info);
+        int rotation =getActivity().getWindowManager().getDefaultDisplay().getRotation();
+        int degrees = 0;
+        int result;
+        if (mCameraID == mFrontCameraID) {
+            result = (info.orientation + degrees) % 360;
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
+            result = (info.orientation - degrees + 360) % 360;
+        }
+        Log.d(TAG, "orientation:" + result);
+        //mCamera.setDisplayOrientation(result);
+
         try {
             mRecorder = new MediaRecorder();
             mCamera.unlock();
             mRecorder.setCamera(mCamera);
-
             mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
             mRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
 
-            mProfile = CamcorderProfile.get(mCameraID, CamcorderProfile.QUALITY_720P);
+            if (CamcorderProfile.hasProfile(mCameraID, CamcorderProfile.QUALITY_720P)) {
+                mProfile = CamcorderProfile.get(mCameraID, CamcorderProfile.QUALITY_720P);
+            }
+            else {
+                mProfile = CamcorderProfile.get(mCameraID, CamcorderProfile.QUALITY_HIGH);
+            }
 
+            if(mCameraID == mFrontCameraID)
+                mRecorder.setOrientationHint(result+180);
+            else
+                mRecorder.setOrientationHint(90);
             mRecorder.setProfile(mProfile);
+
 //            mRecorder.setOutputFormat(mProfile.fileFormat);
 //            mRecorder.setVideoEncoder(mProfile.videoCodec);
 //            mRecorder.setVideoEncodingBitRate(mProfile.videoBitRate);
@@ -280,7 +305,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 }
             }
 
-            mRecorder.setOrientationHint(90);
+
             mRecorder.prepare();
             mRecorder.start();
             mIsRecording = true;
@@ -289,6 +314,7 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 mRecordCallback.onRecordStart(newFile);
             }
         } catch (IOException e) {
+            Log.d(TAG, "record ", e);
             mRecorder.release();
             mRecorder = null;
             throw e;
