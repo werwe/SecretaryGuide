@@ -101,7 +101,11 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
     @OnClick(R.id.start_video_recorder)
     public void onVideoRecoderStart() {
+        if(mPager.getCurrentItem() > 2)
+            return;
+
         Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
+        intent.putExtra("type", mPager.getCurrentItem() + 1);
         startActivity(intent);
     }
 
@@ -114,7 +118,6 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         if (i == 1) {
             Log.d(TAG, String.format("i:%d,v:%f,i2:%d", i, v, i2));
         }
-
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -44,7 +45,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
-
+        mGreetingType = getIntent().getIntExtra("type",1);
         mCameraFragment = CameraFragment.newInstance();
         mCameraFragment.setRecordCallback(this);
         getFragmentManager().beginTransaction().replace(R.id.container, mCameraFragment).commit();
@@ -53,14 +54,17 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     }
 
     public void recordVideo(View v) {
+        Log.d(TAG, "recordVideo");
         try {
             if (mCameraFragment.isRecording())
                 mCameraFragment.stopRecording();
             else
                 mCameraFragment.record();
         } catch (IOException e) {
+            Log.d(TAG, "recordVideo",e);
             e.printStackTrace();
         } catch (Exception e) {
+            Log.d(TAG, "recordVideo",e);
             e.printStackTrace();
         }
     }
@@ -89,7 +93,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
     @Override
     public void onRecordStart(File videoPath) {
-
+        Log.d(TAG, "OnRecordStart");
         mSwitchCameraFace.setEnabled(false);
         mRecord = new GreetingVideo();
         mRecord.path = videoPath.getAbsolutePath();
