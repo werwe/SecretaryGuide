@@ -243,23 +243,37 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
             while (true) {
                 try {
                     Thread.sleep(50);
-                    mLeftVideo.getCurrentPosition();
-                    Message msg = Message.obtain();
-                    msg.arg1 = mLeftVideo.getCurrentPosition();
-                    mHandler.sendMessage(msg);
+                    updateSeekerPosition();
+//                    mLeftVideo.getCurrentPosition();
+//                    Message msg = Message.obtain();
+//
+//                    msg.arg1 = mLeftVideo.getCurrentPosition();
+//                    mHandler.sendMessage(msg);
+
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
+
     }
 
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            int currentPosition = msg.arg1;
-            mSeekBar.setProgress(currentPosition);
-            mDuration.setText(DateFormat.format("m:ss", currentPosition) + " / " + DateFormat.format("m:ss", mLeftVideo.getDuration()));
-        }
-    };
+    private void updateSeekerPosition() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mSeekBar.setProgress(mLeftVideo.getCurrentPosition());
+                mDuration.setText(DateFormat.format("m:ss", mLeftVideo.getCurrentPosition()) + " / " + DateFormat.format("m:ss", mLeftVideo.getDuration()));
+            }
+        });
+    }
+
+//    Handler mHandler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            int currentPosition = msg.arg1;
+//            mSeekBar.setProgress(currentPosition);
+//            mDuration.setText(DateFormat.format("m:ss", currentPosition) + " / " + DateFormat.format("m:ss", mLeftVideo.getDuration()));
+//        }
+//    };
 }

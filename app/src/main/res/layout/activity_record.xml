@@ -8,8 +8,7 @@
     <FrameLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="match_parent" />
 
     <TextView
         android:id="@+id/side"
@@ -18,17 +17,17 @@
         android:background="#33ffffff"
         android:gravity="center"
         android:padding="8dp"
-        android:textSize="20dp"
         android:text="정면을 촬영합니다."
-        android:textColor="#ffff" />
+        android:textColor="#ffff"
+        android:textSize="20dp" />
 
     <LinearLayout
-        android:layout_marginTop="8dp"
-        android:layout_marginRight="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_below="@id/side"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -37,24 +36,23 @@
             style="@android:style/Widget.Holo.Button.Borderless"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/icon_00"
-            android:onClick="switchCamera" />
+            android:onClick="switchCamera"
+            android:src="@drawable/icon_00" />
 
         <ImageView
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:src="@drawable/icon_01"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:layout_marginTop="4dp"
+            android:src="@drawable/icon_01" />
 
         <ImageButton
             android:id="@+id/switch_face"
             style="@android:style/Widget.Holo.Button.Borderless"
-            android:src="@drawable/icon_02"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="switchFace"
-            />
+            android:src="@drawable/icon_02" />
 
     </LinearLayout>
 
@@ -64,8 +62,61 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:onClick="recordVideo"
+        android:onClick="selectTimer"
         android:src="@drawable/icon_03"
         android:text="Record Video" />
+
+    <ImageView
+        android:id="@+id/timer_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:scaleX="10.0"
+        android:scaleY="10.0"
+        android:src="@drawable/number_10"
+        android:visibility="invisible" />
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/menu_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#33333333"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <Button
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:background="#9bd31b"
+            android:id="@+id/btn_replay"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="영상확인"
+            android:layout_marginBottom="8dp"
+            />
+
+
+        <Button
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:background="#9bd31b"
+            android:id="@+id/btn_compare"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="영상비교" />
+
+        <Button
+            android:layout_marginTop="8dp"
+            style="@android:style/Widget.Holo.Button.Borderless"
+            android:background="#9bd31b"
+            android:id="@+id/btn_retake"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="다시촬영" />
+    </LinearLayout>
 
 </RelativeLayout>
