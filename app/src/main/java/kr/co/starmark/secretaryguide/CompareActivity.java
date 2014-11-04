@@ -98,8 +98,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mThread != null && mThread.isAlive())
-            mThread.interrupt();
+        stopSeekerThread();
     }
 
     private String getfaceSide(int side) {
@@ -156,7 +155,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
             mV1IsPlaying = false;
             if (!mV2IsPlaying) {
                 mPlay.setVisibility(View.VISIBLE);
-                mThread.interrupt();
+                stopSeekerThread();
             }
         }
     };
@@ -167,7 +166,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
             mV2IsPlaying = false;
             if (!mV1IsPlaying) {
                 mPlay.setVisibility(View.VISIBLE);
-                mThread.interrupt();
+                stopSeekerThread();
             }
         }
     };
@@ -189,12 +188,22 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         mV2IsPlaying = true;
         mPlay.setVisibility(View.INVISIBLE);
         mToolbarPlay.setText("pause");
-        if (mThread != null && mThread.isAlive()) {
-            mThread.interrupt();
-        }
+        stopSeekerThread();
         mThread = new SeekerThread();
         mThread.start();
 
+    }
+
+    private void stopSeekerThread()
+    {
+        if (mThread != null && mThread.isAlive()) {
+            mThread.stopThread();
+            try {
+                mThread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     SeekerThread mThread;
@@ -237,10 +246,16 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     }
 
     class SeekerThread extends Thread {
+        boolean run = true;
+        public void stopThread()
+        {
+            run = false;
+        }
+
         @Override
         public void run() {
             super.run();
-            while (true) {
+            while (run) {
                 try {
                     Thread.sleep(50);
                     updateSeekerPosition();
