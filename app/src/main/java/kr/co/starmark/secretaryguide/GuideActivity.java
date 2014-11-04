@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -13,6 +14,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -37,7 +41,15 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
     final Logger logger = LoggerFactory.getLogger(GuideActivity.class);
     public static final String TAG = "RecordActivity";
 
-    private static final String[] TITLES = {"가벼운 인사", "보통 인사", "정중한 인사", "menu4", "menu5"};
+    private int ICONS[] = {
+            R.drawable.title_icon_00,
+            R.drawable.title_icon_01,
+            R.drawable.title_icon_02,
+            R.drawable.title_icon_03,
+            R.drawable.title_icon_04
+    };
+
+    private static final String[] TITLES = {"  가벼운 인사", "  보통 인사", "  정중한 인사", "  전화 예절", "  내방객 응대"};
 
     GreetingVideo mRecord;
     int mGreetingType = 1; // 1 , 2 , 3
@@ -69,9 +81,10 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(this);
         mPagerHeader.setGravity(Gravity.CENTER);
-        mPagerHeader.setTabIndicatorColor(Color.CYAN);
+        mPagerHeader.setTabIndicatorColor(getResources().getColor(R.color.base));
         mPagerHeader.setTextSpacing(10);
-        mPagerHeader.setTextColor(Color.BLUE);
+        mPagerHeader.setNonPrimaryAlpha(0.3f);
+        mPagerHeader.setTextColor(Color.argb(255,10,89,152));
     }
 
     private void setActionBar() {
@@ -133,7 +146,14 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
             mStartVideoRecorder.hide(true);
         else
             mStartVideoRecorder.show(true);
-    }
+
+        if(i < 3)
+            mTitle.setText("인사 예절");
+        else if(i == 3 )
+            mTitle.setText("전화 예절");
+        else if(i == 4)
+            mTitle.setText("내방객 응대");
+   }
 
     @Override
     public void onPageScrollStateChanged(int i) {
@@ -168,7 +188,14 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         }
 
         public CharSequence getPageTitle(int position) {
-            return TITLES[position];
+            Drawable myDrawable = getResources().getDrawable(ICONS[position]);
+            SpannableStringBuilder sb = new SpannableStringBuilder(TITLES[position]); // space added before text for convenience
+
+            myDrawable.setBounds(0, 0, myDrawable.getIntrinsicWidth(), myDrawable.getIntrinsicHeight());
+            ImageSpan span = new ImageSpan(myDrawable, ImageSpan.ALIGN_BASELINE);
+            sb.setSpan(span, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+            return sb;
         }
     }
 
@@ -229,7 +256,6 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
         @OnClick(R.id.btn_play)
         public void play(final View view) {
-            Log.d(TAG, "play");
             if (mVideo == null) {
                 addVideoView();
             }
@@ -238,7 +264,6 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
             mVideo.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mediaPlayer) {
-                    Log.d(TAG, "onPrepared");
                     mediaPlayer.seekTo(0);
                     mVideo.start();
                     view.setVisibility(View.GONE);

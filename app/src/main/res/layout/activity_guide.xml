@@ -16,9 +16,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:background="@drawable/tab_unselect"
+            android:background="@drawable/tab_background"
             android:textColor="#0000"
-            android:textSize="14.5dp" />
+            android:textSize="16dp" />
     </android.support.v4.view.ViewPager>
 
     <com.melnykov.fab.FloatingActionButton
@@ -27,10 +27,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="16dp"
-        android:src="@android:drawable/presence_video_online"
+        android:src="@drawable/record_icon_small"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        fab:fab_colorNormal="@android:color/holo_red_dark"
-        fab:fab_colorPressed="@android:color/holo_red_light"/>
+        fab:fab_colorNormal="@color/base"
+        fab:fab_colorPressed="@android:color/holo_blue_bright"/>
 
 </RelativeLayout>
