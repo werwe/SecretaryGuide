@@ -175,12 +175,9 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         @Override
         public Fragment getItem(int position) {
             if (position < 3) {
-                Log.d(TAG, "Position:" + (position + 1));
                 return PageFragment.create(
                         new Uri[]{
-                                getVideoUri(position + 1, 1),
-                                getVideoUri(position + 1, 1),
-                                getVideoUri(position + 1, 2)
+                                getVideoUri(position + 1, 1)
                         }
                 );
             }
@@ -208,7 +205,7 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         ImageView mPreview;
 
         @InjectView(R.id.videoContainer)
-        FrameLayout mVideoContainer;
+        RelativeLayout mVideoContainer;
 
         @InjectView(R.id.btn_play)
         ImageView mBtnPlay;
@@ -249,8 +246,11 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
         private void addVideoView() {
             mVideo = new VideoView(getActivity().getApplicationContext());
-            FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(mPreview.getWidth(), mPreview.getHeight());
-            params.gravity = Gravity.CENTER;
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mPreview.getWidth(), mPreview.getHeight());
+            params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+            params.addRule(RelativeLayout.ALIGN_PARENT_TOP);
             mVideoContainer.addView(mVideo, params);
         }
 
