@@ -34,9 +34,20 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
         @InjectView(R.id.date)
         TextView mDate;
 
+        @InjectView(R.id.delete_check)
+        ImageView mDeleteIcon;
+
         VideoRecordItem(View view) {
             super(view);
             ButterKnife.inject(this, view);
+        }
+
+        public void checkDelete() {
+            mDeleteIcon.setVisibility(View.VISIBLE);
+        }
+
+        public void uncheckDelete() {
+            mDeleteIcon.setVisibility(View.GONE);
         }
 
         public ImageView getThumbnail() {
@@ -113,9 +124,10 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
         notifyItemInserted(position);
     }
 
-    public void removeItem(int position) {
-        mRecords.remove(position);
+    public GreetingVideo removeItem(int position) {
+        GreetingVideo video = mRecords.remove(position);
         notifyItemRemoved(position);
+        return video;
     }
 
     public void removeItem(GreetingVideo item) {

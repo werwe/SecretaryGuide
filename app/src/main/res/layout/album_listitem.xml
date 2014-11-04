@@ -29,4 +29,13 @@
         android:background="#33ff"
         android:text="2014년 10월 20일" />
 
+    <kr.co.starmark.secretaryguide.widget.CheckableImageView
+        android:visibility="gone"
+        android:id="@+id/delete_check"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#66333333"
+        android:src="@android:drawable/ic_delete"
+        />
+
 </RelativeLayout>
