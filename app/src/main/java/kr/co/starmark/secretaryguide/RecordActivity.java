@@ -1,6 +1,8 @@
 package kr.co.starmark.secretaryguide;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.slf4j.Logger;
@@ -25,6 +28,7 @@ import java.util.Locale;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class RecordActivity extends Activity implements CameraFragment.RecordCallback {
 
@@ -61,15 +65,19 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     @InjectView(R.id.switch_face)
     ImageButton mSwitchFace;
 
+    @InjectView(R.id.menu_container)
+    LinearLayout mMenuContainer;
+
     @InjectView(R.id.side)
     TextView mSide;
+
 
     TimerDialogFragment mTimerSelectDialog;
     TimerDialogFragment.TimeAmountSelectCallback mTimerCallback = new TimerDialogFragment.TimeAmountSelectCallback() {
         @Override
         public void onTimeAmount(int seconds) {
             if (seconds == 0)
-                recordVideo();
+                mRecordSequenceTimer.startTimer(10);
             else
                 startTimer(seconds);
         }
@@ -102,8 +110,6 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
     private TextToSpeech tts;
     private Sequence mGreetingSequence;
-
-
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -179,16 +185,16 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         mRecord.side = mFaceSide;
         mRecord.date = DateFormat.format("yyyy-MM-dd-hh-mm-ss", Calendar.getInstance()).toString();
         mRecord.log();
-        //mRecord.save();
+        mRecord.save();
     }
 
     @Override
     public void onRecordStop() {
         mCurrentVideoPath = null;
         mSwitchCameraFace.setEnabled(true);
-        //Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
-        //intent.putExtra("record", mRecord);
-        //startActivity(intent);
+//        Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
+//        intent.putExtra("record", mRecord);
+//        startActivity(intent);
     }
 
     private void startTimer(int seconds) {
@@ -237,7 +243,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 @Override
                 public void run() {
                     mTimerText.setVisibility(View.INVISIBLE);
-                    mRecordSequenceTimer.startTimer(20);
+                    mRecordSequenceTimer.startTimer(10);
                 }
             });
         }
@@ -267,6 +273,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 public void run() {
                     try {
                         mCameraFragment.stopRecording();
+                        showAfterRecordMenu();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -275,12 +282,38 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         }
     };
 
+    private void showAfterRecordMenu() {
+        mMenuContainer.setVisibility(View.VISIBLE);
+    }
+
+    @OnClick(R.id.btn_replay)
+    public void replay() {
+        Intent intent = new Intent(getApplicationContext(), ReplayActivity.class);
+        intent.putExtra("record", mRecord);
+        startActivity(intent);
+        finish();
+    }
+
+    @OnClick(R.id.btn_compare)
+    public void compare() {
+        Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
+        intent.putExtra("record", mRecord);
+        startActivity(intent);
+        finish();
+    }
+
+    @OnClick(R.id.btn_retake)
+    public void retake() {
+        mMenuContainer.setVisibility(View.GONE);
+    }
+
 
     private void initSequence() {
         mGreetingSequence = new Sequence();
         mGreetingSequence.add(new TextReadAction(0, "인사를 시작합니다"));
         mGreetingSequence.add(new RecordAction(3));
         mGreetingSequence.add(new BeepAction(3, mSoundManager));
+        mGreetingSequence.add(new TextReadAction(10, "녹화를 종료합니다"));
     }
 
     abstract class Action {

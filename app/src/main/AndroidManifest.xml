@@ -36,9 +36,8 @@
         <activity
             android:name="kr.co.starmark.secretaryguide.RecordActivity"
             android:label="@string/app_name"
-
-            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Holo.NoActionBar.Fullscreen" />
         <activity android:name="kr.co.starmark.secretaryguide.ClippingVideoViewTest" >
 
             <!-- <intent-filter> -->
@@ -64,6 +63,10 @@
         <activity
             android:name="kr.co.starmark.secretaryguide.GuideActivity"
             android:label="@string/title_activity_album" >
+        </activity>
+        <activity
+            android:name="kr.co.starmark.secretaryguide.ReplayActivity"
+            android:label="@string/title_activity_replay" >
         </activity>
     </application>
 

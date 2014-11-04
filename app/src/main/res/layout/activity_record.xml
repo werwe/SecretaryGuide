@@ -76,47 +76,6 @@
         android:src="@drawable/number_10"
         android:visibility="invisible" />
 
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/menu_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#33333333"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <Button
-            style="@android:style/Widget.Holo.Button.Borderless"
-            android:background="#9bd31b"
-            android:id="@+id/btn_replay"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="영상확인"
-            android:layout_marginBottom="8dp"
-            />
-
-
-        <Button
-            style="@android:style/Widget.Holo.Button.Borderless"
-            android:background="#9bd31b"
-            android:id="@+id/btn_compare"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
-            android:text="영상비교" />
-
-        <Button
-            android:layout_marginTop="8dp"
-            style="@android:style/Widget.Holo.Button.Borderless"
-            android:background="#9bd31b"
-            android:id="@+id/btn_retake"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="다시촬영" />
-    </LinearLayout>
+    <include layout="@layout/after_menu" />
 
 </RelativeLayout>

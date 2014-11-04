@@ -24,5 +24,6 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="title_activity_album">AlbumActivity</string>
     <string name="title_activity_guide">GuideActivity</string>
+    <string name="title_activity_replay">ReplayActivity</string>
 
 </resources>

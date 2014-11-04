@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/menu_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#33333333"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:visibility="gone">
+
+    <Button
+        android:id="@+id/btn_replay"
+        style="@android:style/Widget.Holo.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
+        android:background="#9bd31b"
+        android:text="영상확인" />
+
+
+    <Button
+        android:id="@+id/btn_compare"
+        style="@android:style/Widget.Holo.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:background="#9bd31b"
+        android:text="영상비교" />
+
+    <Button
+        android:id="@+id/btn_retake"
+        style="@android:style/Widget.Holo.Button.Borderless"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="1"
+        android:background="#9bd31b"
+        android:text="다시촬영" />
+</LinearLayout>
