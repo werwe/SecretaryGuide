@@ -1,16 +1,18 @@
 package kr.co.starmark.secretaryguide;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -23,7 +25,6 @@ import org.lucasr.twowayview.ItemSelectionSupport;
 import org.lucasr.twowayview.widget.TwoWayView;
 
 import java.io.File;
-import java.text.Normalizer;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -47,6 +48,12 @@ public class AlbumActivity extends Activity {
     LinearLayout mProgressContainer;
 
     LayoutAdapter mAdapter;
+    @InjectView(R.id.left)
+    Button mLeft;
+    @InjectView(R.id.title)
+    TextView mTitle;
+    @InjectView(R.id.right)
+    ImageButton mRight;
 
     private int mode = NORMAL;
 
@@ -60,10 +67,19 @@ public class AlbumActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album);
+        setActionBar();
         ButterKnife.inject(this);
+        mTitle.setText("앨범");
         setRecyclerView();
         mRecyclerView.setHasFixedSize(true);
         queryData();
+    }
+
+    private void setActionBar() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+        actionBar.setCustomView(R.layout.actionbar);
+        ButterKnife.inject(actionBar.getCustomView());
     }
 
     private void setRecyclerView() {
@@ -146,9 +162,10 @@ public class AlbumActivity extends Activity {
 
     private void deleteAll() {
         int length = mAdapter.getItemCount();
+        Log.d(TAG, "count:" + length);
         ActiveAndroid.beginTransaction();
-        for (int i = 0 ; i < length ; i++) {
-            if(selection.isItemChecked(i)) {
+        for (int i = 0; i < length; i++) {
+            if (selection.isItemChecked(i)) {
                 GreetingVideo record = mAdapter.removeItem(i);
                 GreetingVideo.delete(GreetingVideo.class, record.getId());
                 File f = new File(record.path);
@@ -159,6 +176,9 @@ public class AlbumActivity extends Activity {
         }
         ActiveAndroid.setTransactionSuccessful();
         ActiveAndroid.endTransaction();
+        int count = mAdapter.getItemCount();
+        Log.d(TAG, "count:" + count);
+
         mActionMode.finish();
         switchMode(NORMAL);
     }
@@ -183,7 +203,6 @@ public class AlbumActivity extends Activity {
                 if (mRecords == null || mRecords.isEmpty()) ; //비어있는 화면
                 mAdapter = new LayoutAdapter(AlbumActivity.this, mRecyclerView, mRecords);
                 mRecyclerView.setAdapter(mAdapter);
-                Log.d(TAG, "Records:" + mRecords.size());
             }
         }.execute();
     }
