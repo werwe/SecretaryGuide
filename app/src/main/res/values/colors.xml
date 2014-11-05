@@ -3,4 +3,5 @@
 
     <color name="base" >#ff1EAAF2</color>
     <color name="accent" >#ff1EAAF2</color>
+    <color name="action_mode_back" >#01579b</color>
 </resources>

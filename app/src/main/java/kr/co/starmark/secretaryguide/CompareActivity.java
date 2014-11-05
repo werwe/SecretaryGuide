@@ -3,6 +3,7 @@ package kr.co.starmark.secretaryguide;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -32,7 +33,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     private static final String TAG = CompareActivity.class.getName();
 
     @InjectView(R.id.left)
-    Button mLeft;
+    ImageButton mLeft;
     @InjectView(R.id.title)
     TextView mTitle;
     @InjectView(R.id.right)
@@ -69,6 +70,12 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         setContentView(R.layout.activity_compare);
         setActionBar();
         ButterKnife.inject(this);
+
+        mLeft.setVisibility(View.VISIBLE);
+        mLeft.setImageResource(R.drawable.icon_back);
+        mRight.setVisibility(View.GONE);
+        mTitle.setText("비교하기");
+
         GreetingVideo video = getIntent().getParcelableExtra("record");
 
         video.log();
@@ -137,13 +144,6 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     @OnClick(R.id.left)
     public void left() {
         finish();
-    }
-
-    @OnClick(R.id.right)
-    public void right() {
-        MenuDialogFragment dialog = MenuDialogFragment.newInstance(0);
-        FragmentTransaction ft = getFragmentManager().beginTransaction();
-        dialog.show(ft, "dialog");
     }
 
     boolean mV1IsPlaying = false;

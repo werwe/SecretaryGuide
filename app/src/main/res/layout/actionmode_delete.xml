@@ -5,12 +5,11 @@
 
     <TextView
         android:id="@+id/delete_count"
-        android:text="0"
+        android:text="0 선택됨"
         android:textSize="20sp"
         android:textStyle="bold"
         android:gravity="center"
         android:minWidth="24dp"
-        android:layout_marginLeft="12dp"
         android:layout_marginRight="12sp"
         android:layout_width="wrap_content"
         android:layout_height="match_parent" />
@@ -33,7 +32,7 @@
         android:id="@+id/action_delete"
         android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:src="@android:drawable/ic_menu_delete"
+        android:src="@drawable/icon_trash"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </RelativeLayout>

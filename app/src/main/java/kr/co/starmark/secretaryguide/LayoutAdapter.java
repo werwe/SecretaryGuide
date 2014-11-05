@@ -2,6 +2,7 @@ package kr.co.starmark.secretaryguide;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
@@ -33,6 +34,12 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
         TextView mTitle;
         @InjectView(R.id.date)
         TextView mDate;
+
+        @InjectView(R.id.type_icon)
+        ImageView mTypeIcon;
+
+        @InjectView(R.id.face_side_icon)
+        ImageView mFaceSideIcon;
 
         @InjectView(R.id.delete_check)
         ImageView mDeleteIcon;
@@ -75,7 +82,9 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
         }
 
         public void setItem(GreetingVideo item) {
-            mTitle.setText(getGreetingType(item.type) + " - " + getfaceSide(item.side));
+            mTitle.setText(getGreetingType(item.type));
+            mFaceSideIcon.setImageResource(getfaceSideDrawableId(item.side));
+            mTypeIcon.setImageResource(getGreetingTypeIcon(item.type));
             mDate.setText(item.date);
             new AsyncTask<String, Void, Bitmap>() {
                 @Override
@@ -90,14 +99,14 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
             }.execute(item.path);
         }
 
-        private String getfaceSide(int side) {
+        private int getfaceSideDrawableId(int side) {
             switch (side) {
                 case 1:
-                    return "앞 모습";
+                    return R.drawable.album_item_face_front;
                 case 2:
-                    return "옆 모습";
+                    return R.drawable.album_item_face_side;
             }
-            return "";
+            return R.drawable.album_item_face_front;
         }
 
         private String getGreetingType(int type) {
@@ -110,6 +119,18 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
                     return "정중한 인사";
             }
             return "";
+        }
+
+        private int getGreetingTypeIcon(int type) {
+            switch (type) {
+                case 1:
+                    return R.drawable.album_icon_type_00;
+                case 2:
+                    return R.drawable.album_icon_type_01;
+                case 3:
+                    return R.drawable.album_icon_type_02;
+            }
+            return R.drawable.album_icon_type_00;
         }
     }
 

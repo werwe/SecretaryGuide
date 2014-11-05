@@ -6,7 +6,8 @@
         <!--<item name="android:windowActionBar">true</item>-->
         <!--<item name="android:windowNoTitle">false</item>-->
         <!--<item name="android:actionBarStyle">@style/ActionBar</item>-->
-        <item name="android:actionModeCloseDrawable">@android:drawable/ic_menu_close_clear_cancel</item>
+        <item name="android:actionModeBackground">@color/action_mode_back</item>
+        <item name="android:actionModeCloseDrawable">@drawable/icon_cancel</item>
     </style>
 
     <!--<style name="ActionBar" parent="android:Theme.WithActionBar">-->

@@ -61,7 +61,7 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
     //ActionBar
     @InjectView(R.id.left)
-    Button mLeft;
+    ImageButton mLeft;
     @InjectView(R.id.title)
     TextView mTitle;
     @InjectView(R.id.right)

@@ -29,6 +29,7 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 
 public class AlbumActivity extends Activity {
@@ -49,7 +50,7 @@ public class AlbumActivity extends Activity {
 
     LayoutAdapter mAdapter;
     @InjectView(R.id.left)
-    Button mLeft;
+    ImageButton mLeft;
     @InjectView(R.id.title)
     TextView mTitle;
     @InjectView(R.id.right)
@@ -69,6 +70,9 @@ public class AlbumActivity extends Activity {
         setContentView(R.layout.activity_album);
         setActionBar();
         ButterKnife.inject(this);
+        mLeft.setVisibility(View.VISIBLE);
+        mLeft.setImageResource(R.drawable.icon_back);
+        mRight.setImageResource(R.drawable.icon_trash);
         mTitle.setText("앨범");
         setRecyclerView();
         mRecyclerView.setHasFixedSize(true);
@@ -81,6 +85,20 @@ public class AlbumActivity extends Activity {
         actionBar.setCustomView(R.layout.actionbar);
         ButterKnife.inject(actionBar.getCustomView());
     }
+
+    @OnClick(R.id.left)
+    public void left()
+    {
+        finish();
+    }
+
+    @OnClick(R.id.right)
+    public void right() {
+        selection.setChoiceMode(ItemSelectionSupport.ChoiceMode.MULTIPLE);
+        switchMode(DELETE);
+        switchActionBar();
+    }
+
 
     private void setRecyclerView() {
         selection = ItemSelectionSupport.addTo(mRecyclerView);
@@ -98,6 +116,7 @@ public class AlbumActivity extends Activity {
                     boolean check = selection.isItemChecked(position);
                     selection.setViewChecked(ButterKnife.findById(view, R.id.delete_check), check);
                     selection.setItemChecked(position, check);
+                    mDeleteCount.setText(selection.getCheckedItemCount()+" 선택됨");
                     if (selection.getCheckedItemCount() <= 0)
                         mActionMode.finish();
                 }
@@ -122,7 +141,8 @@ public class AlbumActivity extends Activity {
     private void switchMode(int mode) {
         this.mode = mode;
         if (mode == NORMAL) {
-            selection.clearChoices();
+            if(selection.getCheckedItemCount() > 0)
+                selection.clearChoices();
         }
     }
 
@@ -161,23 +181,32 @@ public class AlbumActivity extends Activity {
     }
 
     private void deleteAll() {
-        int length = mAdapter.getItemCount();
-        Log.d(TAG, "count:" + length);
+        if(selection.getCheckedItemCount() == 0) {
+            mActionMode.finish();
+            switchMode(NORMAL);
+            return;
+        }
+
+        //2개 이상을 한꺼번에 못 지움.
         ActiveAndroid.beginTransaction();
-        for (int i = 0; i < length; i++) {
-            if (selection.isItemChecked(i)) {
-                GreetingVideo record = mAdapter.removeItem(i);
-                GreetingVideo.delete(GreetingVideo.class, record.getId());
-                File f = new File(record.path);
-                if (f.exists()) {
-                    f.delete();
+        for(int j = 0 ; j < selection.getCheckedItemCount() ; j++)
+        {
+            int length = mAdapter.getItemCount();
+            for (int i = 0; i < length; i++) {
+                if (selection.isItemChecked(i)) {
+                    GreetingVideo record = mAdapter.removeItem(i);
+                    GreetingVideo.delete(GreetingVideo.class, record.getId());
+                    File f = new File(record.path);
+                    if (f.exists()) {
+                        f.delete();
+                    }
+                    break;
                 }
             }
         }
         ActiveAndroid.setTransactionSuccessful();
         ActiveAndroid.endTransaction();
         int count = mAdapter.getItemCount();
-        Log.d(TAG, "count:" + count);
 
         mActionMode.finish();
         switchMode(NORMAL);
