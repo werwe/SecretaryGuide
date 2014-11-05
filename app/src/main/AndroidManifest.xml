@@ -24,6 +24,7 @@
             android:value="1" />
 
         <activity
+            android:screenOrientation="portrait"
             android:name="kr.co.starmark.secretaryguide.SplashActivity"
             android:label="@string/title_activity_splash"
             android:theme="@android:style/Theme.Holo.NoActionBar" >
@@ -51,20 +52,22 @@
             android:name="kr.co.starmark.secretaryguide.CompareActivity"
             android:label="@string/title_activity_compare"
             android:screenOrientation="portrait" >
-
             <!-- <meta-data -->
             <!-- android:name="android.support.PARENT_ACTIVITY" -->
             <!-- android:value="kr.co.starmark.secretaryguide.RecordActivity" /> -->
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name="kr.co.starmark.secretaryguide.AlbumActivity"
             android:label="@string/title_activity_album" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name="kr.co.starmark.secretaryguide.GuideActivity"
             android:label="@string/title_activity_album" >
         </activity>
         <activity
+            android:screenOrientation="portrait"
             android:name="kr.co.starmark.secretaryguide.ReplayActivity"
             android:label="@string/title_activity_replay" >
         </activity>
