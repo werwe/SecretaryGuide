@@ -256,8 +256,8 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
             mRecorder = new MediaRecorder();
             mCamera.unlock();
             mRecorder.setCamera(mCamera);
-            mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
-            mRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+//            mRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT);
+            mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
 
             if (CamcorderProfile.hasProfile(mCameraID, CamcorderProfile.QUALITY_720P)) {
                 mProfile = CamcorderProfile.get(mCameraID, CamcorderProfile.QUALITY_720P);
@@ -270,13 +270,15 @@ public class CameraFragment extends Fragment implements TextureView.SurfaceTextu
                 mRecorder.setOrientationHint(result+180);
             else
                 mRecorder.setOrientationHint(90);
-            mRecorder.setProfile(mProfile);
 
-//            mRecorder.setOutputFormat(mProfile.fileFormat);
-//            mRecorder.setVideoEncoder(mProfile.videoCodec);
-//            mRecorder.setVideoEncodingBitRate(mProfile.videoBitRate);
-//            mRecorder.setVideoFrameRate(mProfile.videoFrameRate);
-//            mRecorder.setVideoSize(mProfile.videoFrameWidth,mProfile.videoFrameHeight);
+            mRecorder.setOutputFormat(mProfile.fileFormat);
+            mRecorder.setVideoEncoder(mProfile.videoCodec);
+            mRecorder.setVideoEncodingBitRate(mProfile.videoBitRate);
+            mRecorder.setVideoFrameRate(mProfile.videoFrameRate);
+            mRecorder.setVideoSize(mProfile.videoFrameWidth, mProfile.videoFrameHeight);
+//            mRecorder.setProfile(mProfile);
+
+
             // This is all very sloppy
             File newFile = null;
             if (mProfile.fileFormat == MediaRecorder.OutputFormat.THREE_GPP) {
