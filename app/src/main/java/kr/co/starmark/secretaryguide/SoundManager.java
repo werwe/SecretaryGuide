@@ -15,9 +15,11 @@ public class SoundManager {
     private Context mContext;
 
     private HashMap<Integer,Integer> mSoundMap;
+    private HashMap<Integer,Integer> mStreamID;
 
     private SoundManager(Context context) {
         mSoundMap = new HashMap<Integer, Integer>();
+        mStreamID = new HashMap<Integer, Integer>();
         mPool = new SoundPool(5, AudioManager.STREAM_MUSIC, 0);
         mContext = context;
     }
@@ -34,13 +36,24 @@ public class SoundManager {
 
     public void play(int resid)
     {
-        mPool.play(mSoundMap.get(resid),1,10,10,0,1);
+        int streamid = mPool.play(mSoundMap.get(resid),1,10,10,0,1);
+        mStreamID.put(resid, streamid);
+
     }
 
     public void unload()
     {
+        stopAll();
         for(Integer value:mSoundMap.values()) {
             mPool.unload(value);
         }
+    }
+
+    public void stopAll()
+    {
+        for(Integer value:mStreamID.values()) {
+            mPool.stop(value);
+        }
+        mStreamID.clear();
     }
 }
