@@ -122,6 +122,10 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         startActivity(intent);
     }
 
+    private Uri getGuideVideoUri(){
+        return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_guide");
+    }
+
     private Uri getVideoUri(int type, int side) {
         return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_sample_" + type + "_" + side);
     }
@@ -177,16 +181,16 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
             if (position < 3) {
                 return PageFragment.create(
                         new Uri[]{
-                                getVideoUri(position + 1, 1)
+                                getGuideVideoUri()
                         }
                 );
             }
-            return PageFragment.create(new Uri[]{getVideoUri(2, 1)});
+            return PageFragment.create(new Uri[]{getGuideVideoUri()});
         }
 
         public CharSequence getPageTitle(int position) {
             Drawable myDrawable = getResources().getDrawable(ICONS[position]);
-            SpannableStringBuilder sb = new SpannableStringBuilder(TITLES[position]); // space added before text for convenience
+            SpannableStringBuilder sb = new SpannableStringBuilder(TITLES[position]);
 
             myDrawable.setBounds(0, 0, myDrawable.getIntrinsicWidth(), myDrawable.getIntrinsicHeight());
             ImageSpan span = new ImageSpan(myDrawable, ImageSpan.ALIGN_BASELINE);
