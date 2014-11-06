@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.*;
 
+import java.io.File;
+
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
@@ -26,12 +28,14 @@ public class ReplayActivity extends Activity {
     ImageButton mRetake;
     @InjectView(R.id.menu_container)
     RelativeLayout mMenuContainer;
+    private int mGreetingType = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_replay);
         ButterKnife.inject(this);
+        mGreetingType = getIntent().getIntExtra("type", 1);
         mVideoRecord = getIntent().getParcelableExtra("record");
         mMenuContainer.setVisibility(View.GONE);
         replay();
@@ -61,6 +65,15 @@ public class ReplayActivity extends Activity {
 
     @OnClick(R.id.btn_retake)
     public void retake() {
+        GreetingVideo.delete(GreetingVideo.class, mVideoRecord.mStoredId);
+        File f = new File(mVideoRecord.path);
+        if (f.exists()) {
+            f.delete();
+        }
+        Intent intent = new Intent(getApplicationContext(),RecordActivity.class);
+        intent.putExtra("type", mGreetingType);
+        startActivity(intent);
         finish();
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
     }
 }

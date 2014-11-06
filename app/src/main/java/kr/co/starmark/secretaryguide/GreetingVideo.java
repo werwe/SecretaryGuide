@@ -29,6 +29,8 @@ public class GreetingVideo extends Model implements Parcelable {
     @Column(name = "Date")
     public String date;
 
+    public Long mStoredId;
+
     public GreetingVideo() {
         super();
     }
@@ -59,6 +61,7 @@ public class GreetingVideo extends Model implements Parcelable {
         dest.writeInt(this.type);
         dest.writeInt(this.side);
         dest.writeString(this.date);
+        dest.writeLong(this.getId());
     }
 
     private GreetingVideo(Parcel in) {
@@ -66,6 +69,7 @@ public class GreetingVideo extends Model implements Parcelable {
         this.type = in.readInt();
         this.side = in.readInt();
         this.date = in.readString();
+        mStoredId = in.readLong();
     }
 
     public static final Parcelable.Creator<GreetingVideo> CREATOR = new Parcelable.Creator<GreetingVideo>() {

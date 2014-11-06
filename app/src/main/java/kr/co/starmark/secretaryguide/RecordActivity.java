@@ -365,9 +365,11 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     @OnClick(R.id.btn_replay)
     public void replay() {
         Intent intent = new Intent(getApplicationContext(), ReplayActivity.class);
+        intent.putExtra("type", mGreetingType);
         intent.putExtra("record", mRecord);
         startActivity(intent);
         finish();
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
     }
 
     @OnClick(R.id.btn_compare)
