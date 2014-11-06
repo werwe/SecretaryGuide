@@ -25,7 +25,8 @@ public class Timer {
 
             if (count > 0) {
                 mCountIndex = (int) (count / 1000);
-                mTimerCallback.onTime(mCountIndex);
+                if (mTimerCallback != null)
+                    mTimerCallback.onTime(mCountIndex);
             } else {
                 mRun = false;
                 if (mTimerCallback != null) {
@@ -43,7 +44,8 @@ public class Timer {
 
             if (count < (mTimeAmount + 1) * 1000) {
                 mCountIndex = (int) (count / 1000);
-                mTimerCallback.onTime(mCountIndex);
+                if (mTimerCallback != null)
+                    mTimerCallback.onTime(mCountIndex);
             } else {
                 mRun = false;
                 if (mTimerCallback != null) {
@@ -68,7 +70,7 @@ public class Timer {
         public void onTimeEnd();
     }
 
-    public void setTimerCallback(TimerCallback callback) {
+    public synchronized void setTimerCallback(TimerCallback callback) {
         this.mTimerCallback = callback;
     }
 
