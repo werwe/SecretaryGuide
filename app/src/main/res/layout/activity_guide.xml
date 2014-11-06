@@ -30,7 +30,7 @@
         android:src="@drawable/record_icon_small"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        fab:fab_colorNormal="@android:color/holo_red_dark"
-        fab:fab_colorPressed="@android:color/holo_red_light"/>
+        fab:fab_colorNormal="#dd191d"
+        fab:fab_colorPressed="#f36c60"/>
 
 </RelativeLayout>
