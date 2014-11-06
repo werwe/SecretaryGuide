@@ -3,6 +3,6 @@
     <item android:drawable="@drawable/tab_select" android:state_checked="true" android:state_pressed="true" />
     <item android:drawable="@drawable/tab_select" android:state_pressed="true" />
     <item android:drawable="@drawable/tab_select" android:state_checked="true" />
-    <item android:drawable="@drawable/tab_unselect" />
+    <item android:drawable="@drawable/tab_select" />
 
 </selector>
