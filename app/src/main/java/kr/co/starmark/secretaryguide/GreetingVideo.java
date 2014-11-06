@@ -5,11 +5,10 @@ import android.os.Parcelable;
 import android.util.Log;
 
 import com.activeandroid.Model;
-import com.activeandroid.TableInfo;
 import com.activeandroid.annotation.Column;
 import com.activeandroid.annotation.Table;
 
-import dalvik.system.PathClassLoader;
+import java.sql.Savepoint;
 
 /**
  * Created by starmark on 2014. 10. 16..
@@ -29,7 +28,7 @@ public class GreetingVideo extends Model implements Parcelable {
     @Column(name = "Date")
     public String date;
 
-    public Long mStoredId;
+    public long storedId;
 
     public GreetingVideo() {
         super();
@@ -61,7 +60,7 @@ public class GreetingVideo extends Model implements Parcelable {
         dest.writeInt(this.type);
         dest.writeInt(this.side);
         dest.writeString(this.date);
-        dest.writeLong(this.getId());
+        dest.writeLong(this.storedId);
     }
 
     private GreetingVideo(Parcel in) {
@@ -69,7 +68,7 @@ public class GreetingVideo extends Model implements Parcelable {
         this.type = in.readInt();
         this.side = in.readInt();
         this.date = in.readString();
-        mStoredId = in.readLong();
+        storedId = in.readLong();
     }
 
     public static final Parcelable.Creator<GreetingVideo> CREATOR = new Parcelable.Creator<GreetingVideo>() {

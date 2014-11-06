@@ -3,8 +3,9 @@
     android:id="@+id/menu_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#33333333"
-    android:visibility="invisible"
+    android:background="#cc000000"
+    android:visibility="gone"
+    android:soundEffectsEnabled="false"
     >
 
     <ImageView
@@ -19,7 +20,7 @@
     <ImageButton
         android:layout_marginRight="18dp"
         android:layout_marginTop="24.5dp"
-        android:id="@+id/cancel_record"
+        android:id="@+id/menu_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

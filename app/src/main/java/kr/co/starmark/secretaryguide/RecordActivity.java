@@ -8,7 +8,6 @@ import android.speech.tts.UtteranceProgressListener;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -143,6 +142,9 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         mSoundManager.load(R.raw.audio_greeing_start);
         mSoundManager.load(R.raw.audio_greeting_end);
 
+        mMenuContainer.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {}
+        });
 //        tts = new TextToSpeech(getApplicationContext(), mSpeechInitListener);
         initSequence();
     }
@@ -154,6 +156,13 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         finish();
         overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_down_translate);
     }
+
+    @OnClick(R.id.menu_close)
+    public void afterMemuClose()
+    {
+        finish();
+    }
+
 
     //Timer click callback
     @OnClick(R.id.no_delay)
@@ -248,7 +257,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         mRecord.side = mFaceSide;
         mRecord.date = DateFormat.format("yyyy.MM.dd hh:mm:ss", Calendar.getInstance()).toString();
         mRecord.log();
-        mRecord.save();
+        mRecord.storedId = mRecord.save();
     }
 
     @Override

@@ -65,7 +65,7 @@ public class ReplayActivity extends Activity {
 
     @OnClick(R.id.btn_retake)
     public void retake() {
-        GreetingVideo.delete(GreetingVideo.class, mVideoRecord.mStoredId);
+        GreetingVideo.delete(GreetingVideo.class, mVideoRecord.storedId);
         File f = new File(mVideoRecord.path);
         if (f.exists()) {
             f.delete();
@@ -74,6 +74,6 @@ public class ReplayActivity extends Activity {
         intent.putExtra("type", mGreetingType);
         startActivity(intent);
         finish();
-        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+        overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
     }
 }
