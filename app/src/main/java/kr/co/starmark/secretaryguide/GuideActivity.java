@@ -107,9 +107,9 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
     @OnClick(R.id.right)
     public void onActionBarRight() {
-
         Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.activity_open_translate,R.anim.activity_close_scale);
     }
 
     @OnClick(R.id.start_video_recorder)

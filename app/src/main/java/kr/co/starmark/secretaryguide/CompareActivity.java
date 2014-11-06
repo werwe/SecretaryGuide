@@ -117,6 +117,12 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         stopSeekerThread();
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
+    }
+
     private String getfaceSide(int side) {
         switch (side) {
             case 1:

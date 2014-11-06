@@ -99,6 +99,11 @@ public class AlbumActivity extends Activity {
         switchActionBar();
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
+    }
 
     private void setRecyclerView() {
         selection = ItemSelectionSupport.addTo(mRecyclerView);
@@ -112,6 +117,7 @@ public class AlbumActivity extends Activity {
                     Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
                     intent.putExtra("record", video);
                     startActivity(intent);
+                    overridePendingTransition(R.anim.activity_open_translate,R.anim.activity_close_scale);
                 } else {
                     boolean check = selection.isItemChecked(position);
                     selection.setViewChecked(ButterKnife.findById(view, R.id.delete_check), check);
