@@ -19,13 +19,13 @@ public class ReplayActivity extends Activity {
     @InjectView(R.id.video)
     android.widget.VideoView mVideo;
     @InjectView(R.id.btn_replay)
-    Button mReplay;
+    ImageButton mReplay;
     @InjectView(R.id.btn_compare)
-    Button mCompare;
+    ImageButton mCompare;
     @InjectView(R.id.btn_retake)
-    Button mRetake;
+    ImageButton mRetake;
     @InjectView(R.id.menu_container)
-    LinearLayout mMenuContainer;
+    RelativeLayout mMenuContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -2,27 +2,26 @@ package kr.co.starmark.secretaryguide;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.media.MediaPlayer;
-import android.media.SoundPool;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.text.format.DateFormat;
 import android.util.Log;
-import android.view.SoundEffectConstants;
 import android.view.View;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Locale;
 
@@ -66,23 +65,14 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     ImageButton mSwitchFace;
 
     @InjectView(R.id.menu_container)
-    LinearLayout mMenuContainer;
+    RelativeLayout mMenuContainer;
 
-    @InjectView(R.id.side)
-    TextView mSide;
+//    @InjectView(R.id.side)
+//    TextView mSide;
 
 
-    TimerDialogFragment mTimerSelectDialog;
-    TimerDialogFragment.TimeAmountSelectCallback mTimerCallback = new TimerDialogFragment.TimeAmountSelectCallback() {
-        @Override
-        public void onTimeAmount(int seconds) {
-            if (seconds == 0)
-                mRecordSequenceTimer.startTimer(10);
-            else
-                startTimer(seconds);
-        }
-
-    };
+    @InjectView(R.id.guide_image)
+    ImageView mGuide;
 
     Timer mCountDownTimer;
     Timer mRecordSequenceTimer;
@@ -108,12 +98,36 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         }
     };
 
+
+    @InjectView(R.id.cancel_record)
+    ImageButton mCancelRecord;
+
+    @InjectView(R.id.no_delay)
+    ImageButton mNoDelay;
+    @InjectView(R.id.delay_5)
+    ImageButton mDelay5;
+    @InjectView(R.id.delay_10)
+    ImageButton mDelay10;
+    @InjectView(R.id.timerContainer)
+    LinearLayout mTimerContainer;
+    @InjectView(R.id.text_timer_choose)
+    ImageView mTimerChooseText;
+
+//    @InjectView(R.id.btn_replay)
+//    Button mBtnReplay;
+//    @InjectView(R.id.btn_compare)
+//    Button mBtnCompare;
+//    @InjectView(R.id.btn_retake)
+//    Button mBtnRetake;
+
     private TextToSpeech tts;
     private Sequence mGreetingSequence;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
+
+
         mGreetingType = getIntent().getIntExtra("type", 1);
         mCameraFragment = CameraFragment.newInstance();
         mCameraFragment.setRecordCallback(this);
@@ -123,11 +137,59 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         mCountDownTimer.setTimerCallback(mCountDownCallback);
         mRecordSequenceTimer = new Timer(Timer.ORDER.INCREASE);
         mRecordSequenceTimer.setTimerCallback(mRecordingTimeCallback);
+
         mSoundManager = SoundManager.createInstance(getApplicationContext());
-        mSoundManager.load(R.raw.your_turn);
-        tts = new TextToSpeech(getApplicationContext(), mSpeechInitListener);
+        mSoundManager.load(R.raw.audio_count);
+        mSoundManager.load(R.raw.audio_greeing_start);
+        mSoundManager.load(R.raw.audio_greeting_end);
+
+//        tts = new TextToSpeech(getApplicationContext(), mSpeechInitListener);
         initSequence();
     }
+
+    @OnClick(R.id.cancel_record)
+    public void cancelRecord()
+    {
+        finish();
+    }
+
+    //Timer click callback
+    @OnClick(R.id.no_delay)
+    public void recordStartImmediatly()
+    {
+        resetSequeceHead();
+        mRecordSequenceTimer.startTimer(8);
+        hideTimerLayout();
+    }
+
+    @OnClick(R.id.delay_5)
+    public void recordAfter5Seconds()
+    {
+        resetSequeceHead();
+        startTimer(5);
+        hideTimerLayout();
+    }
+
+    @OnClick(R.id.delay_10)
+    public void recordAfter10Seconds()
+    {
+        resetSequeceHead();
+        startTimer(10);
+        hideTimerLayout();
+    }
+
+    private void hideTimerLayout() {
+        mTimerContainer.setVisibility(View.GONE);
+        mTimerChooseText.setVisibility(View.GONE);
+    }
+
+    private void showTimerLayout() {
+        mTimerChooseText.setImageResource(R.drawable.text_choose_time);
+        mTimerContainer.setVisibility(View.VISIBLE);
+        mTimerChooseText.setVisibility(View.VISIBLE);
+    }
+    //timer click
+
 
     public void recordVideo() {
         try {
@@ -144,12 +206,6 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         }
     }
 
-    public void selectTimer(View v) {
-        if (mTimerSelectDialog == null)
-            mTimerSelectDialog = TimerDialogFragment.newInstance();
-        mTimerSelectDialog.setTimerCallback(mTimerCallback);
-        mTimerSelectDialog.show(getFragmentManager(), "timerdialog");
-    }
 
     public void switchCamera(View v) {
         mCameraFragment.switchCamera();
@@ -162,9 +218,11 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
             mFaceSide = 1;
 
         if (mFaceSide == 1)
-            mSide.setText("정면을 촬영합니다.");
+            mGuide.setImageResource(R.drawable.record_guide_front);
+//            mSide.setText("정면을 촬영합니다.");
         else if (mFaceSide == 2)
-            mSide.setText("측면을 촬영합니다.");
+            mGuide.setImageResource(R.drawable.record_guide_side);
+//            mSide.setText("측면을 촬영합니다.");
     }
 
     @Override
@@ -172,6 +230,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         super.onDestroy();
         mCountDownTimer.setTimerCallback(null);
         mCountDownTimer.stopTimer();
+        mSoundManager.unload();
         ButterKnife.reset(this);
     }
 
@@ -183,7 +242,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         mRecord.path = videoPath.getAbsolutePath();
         mRecord.type = mGreetingType;
         mRecord.side = mFaceSide;
-        mRecord.date = DateFormat.format("yyyy-MM-dd-hh-mm-ss", Calendar.getInstance()).toString();
+        mRecord.date = DateFormat.format("yyyy.MM.dd hh:mm:ss", Calendar.getInstance()).toString();
         mRecord.log();
         mRecord.save();
     }
@@ -192,9 +251,6 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     public void onRecordStop() {
         mCurrentVideoPath = null;
         mSwitchCameraFace.setEnabled(true);
-//        Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
-//        intent.putExtra("record", mRecord);
-//        startActivity(intent);
     }
 
     private void startTimer(int seconds) {
@@ -214,7 +270,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 mCameraFragment.setRecordCallback(null);
                 mCameraFragment.stopRecording();
             }
-            if (mCurrentVideoPath.exists())
+            if (mCurrentVideoPath != null && mCurrentVideoPath.exists())
                 mCurrentVideoPath.delete();
 
         } catch (IOException e) {
@@ -223,16 +279,19 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
             Log.d(TAG, "recordVideo", e);
         }
         super.onBackPressed();
-
     }
 
     Timer.TimerCallback mCountDownCallback = new Timer.TimerCallback() {
+        int mSecond = -1;
         @Override
         public void onTime(final int seconds) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     mTimerText.setImageResource(NUMBERS[seconds]);
+                    if(mSecond != seconds)
+                        mSoundManager.play(R.raw.audio_count);
+                    mSecond = seconds;
                 }
             });
         }
@@ -256,7 +315,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 @Override
                 public void run() {
                     Action action = mGreetingSequence.head();
-                    if(action == null)
+                    if (action == null)
                         return;
                     if (seconds == action.getTiming()) {
                         action.action();
@@ -268,17 +327,17 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
         @Override
         public void onTimeEnd() {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        mCameraFragment.stopRecording();
-                        showAfterRecordMenu();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        mCameraFragment.stopRecording();
+//                        showAfterRecordMenu();
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            });
         }
     };
 
@@ -305,15 +364,30 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     @OnClick(R.id.btn_retake)
     public void retake() {
         mMenuContainer.setVisibility(View.GONE);
+
+        showTimerLayout();
+        mRecord.delete();
+        File f = new File(mRecord.path);
+        if (f.exists()) {
+            f.delete();
+        }
+        mRecord = null;
     }
 
 
     private void initSequence() {
         mGreetingSequence = new Sequence();
-        mGreetingSequence.add(new TextReadAction(0, "인사를 시작합니다"));
-        mGreetingSequence.add(new RecordAction(3));
-        mGreetingSequence.add(new BeepAction(3, mSoundManager));
-        mGreetingSequence.add(new TextReadAction(10, "녹화를 종료합니다"));
+        mGreetingSequence.add(new RecordAction(0));
+        mGreetingSequence.add(new ShowNotiTextAction(1));
+        mGreetingSequence.add(new SoundAction(2, mSoundManager,R.raw.audio_greeing_start));
+        mGreetingSequence.add(new RemoveNotiTextAction(4));
+        mGreetingSequence.add(new RecordStopAction(7));
+        mGreetingSequence.add(new SoundAction(8, mSoundManager,R.raw.audio_greeting_end));
+    }
+
+    private void resetSequeceHead()
+    {
+        mGreetingSequence.resetHead();
     }
 
     abstract class Action {
@@ -333,6 +407,31 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         abstract public void action();
     }
 
+    class ShowNotiTextAction extends Action{
+
+        public ShowNotiTextAction(int timing) {
+            super(timing);
+        }
+
+        @Override
+        public void action() {
+            mTimerChooseText.setImageResource(R.drawable.text_start_greeting);
+            mTimerChooseText.setVisibility(View.VISIBLE);
+        }
+    }
+
+    class RemoveNotiTextAction extends Action{
+
+        public RemoveNotiTextAction(int timing) {
+            super(timing);
+        }
+
+        @Override
+        public void action() {
+            mTimerChooseText.setVisibility(View.GONE);
+        }
+    }
+
     class Sequence extends LinkedList<Action> {
         int mHead = 0;
 
@@ -347,35 +446,98 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 return null;
             return get(mHead);
         }
+
+        public void resetHead() {
+            mHead = 0;
+        }
     }
 
-    class BeepAction extends Action {
+    class SoundAction extends Action {
         SoundManager mManager;
-
-        public BeepAction(int time, SoundManager manager) {
+        int mSoundRes = -1;
+        public SoundAction(int time, SoundManager manager, int soundres) {
             super(time);
             mManager = manager;
+            mSoundRes = soundres;
         }
 
         @Override
         public void action() {
-            mManager.play(R.raw.your_turn);
-            Log.d(TAG, "beep action");
+            mManager.play(mSoundRes);
         }
     }
 
     class TextReadAction extends Action {
         String mText;
+        String mUtteranceId;
+        HashMap<String, String> mParameters = new HashMap<String, String>();
 
         public TextReadAction(int timing, String text) {
             super(timing);
             mText = text;
+            mUtteranceId = "default";
+        }
+
+        public TextReadAction(int timing, String text, String utterId) {
+            super(timing);
+            mText = text;
+            mUtteranceId = utterId;
         }
 
         @Override
         public void action() {
-            tts.speak(mText, TextToSpeech.QUEUE_FLUSH, null);
+
+
+//            final int id = tts.speak(mText, TextToSpeech.QUEUE_FLUSH, mUtteranceId);
+//            tts.speak(mText, TextToSpeech.QUEUE_FLUSH, null, mUtteranceId);
             Log.d(TAG, "speak action");
+        }
+    }
+
+    class NotiAndReadAction extends TextReadAction {
+
+        public NotiAndReadAction(int timing, String text) {
+            super(timing, text);
+            initUtterProgressListner();
+        }
+
+        private void initUtterProgressListner() {
+            tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                @Override
+                public void onStart(String utteranceId) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTimerChooseText.setImageResource(R.drawable.text_start_greeting);
+                            mTimerChooseText.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
+
+                @Override
+                public void onDone(String utteranceId) {
+                    Log.d(TAG, "onDone");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTimerChooseText.setVisibility(View.GONE);
+                        }
+                    });
+
+                    tts.setOnUtteranceProgressListener(null);
+                }
+
+                @Override
+                public void onError(String utteranceId) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mTimerChooseText.setVisibility(View.GONE);
+                        }
+                    });
+                    tts.setOnUtteranceProgressListener(null);
+                }
+            });
         }
     }
 
@@ -387,7 +549,29 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         @Override
         public void action() {
             Log.d(TAG, "recording action");
+
             recordVideo();
+        }
+    }
+
+    class RecordStopAction extends Action {
+        public RecordStopAction(int timing){
+            super(timing);
+        }
+
+        @Override
+        public void action() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mCameraFragment.stopRecording();
+                        showAfterRecordMenu();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
         }
     }
 }

@@ -1,43 +1,70 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/menu_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#33333333"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:visibility="gone">
+    android:visibility="invisible"
+    >
 
-    <Button
-        android:id="@+id/btn_replay"
-        style="@android:style/Widget.Holo.Button.Borderless"
+    <ImageView
+        android:id="@+id/text_end_record_noti"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/text_end_record" />
+
+
+    <ImageButton
+        android:layout_marginRight="18dp"
+        android:layout_marginTop="24.5dp"
+        android:id="@+id/cancel_record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/button_record_close"
+        />
+
+    <LinearLayout
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_weight="1"
-        android:background="#9bd31b"
-        android:text="영상확인" />
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:visibility="visible">
 
+        <ImageButton
+            android:id="@+id/btn_replay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/button_replay_video" />
 
-    <Button
-        android:id="@+id/btn_compare"
-        style="@android:style/Widget.Holo.Button.Borderless"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
-        android:background="#9bd31b"
-        android:text="영상비교" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/line_record_end_button_split" />
 
-    <Button
-        android:id="@+id/btn_retake"
-        style="@android:style/Widget.Holo.Button.Borderless"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
-        android:background="#9bd31b"
-        android:text="다시촬영" />
-</LinearLayout>
+        <ImageButton
+            android:id="@+id/btn_compare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_compare_video" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/line_record_end_button_split" />
+
+        <ImageButton
+            android:id="@+id/btn_retake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_retake_video" />
+    </LinearLayout>
+</RelativeLayout>
