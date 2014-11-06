@@ -150,7 +150,9 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     @OnClick(R.id.cancel_record)
     public void cancelRecord()
     {
+        terminateRecord();
         finish();
+        overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_down_translate);
     }
 
     //Timer click callback
@@ -228,10 +230,12 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mCountDownTimer.setTimerCallback(null);
-        mCountDownTimer.stopTimer();
-        mSoundManager.unload();
         ButterKnife.reset(this);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
     }
 
     @Override
@@ -265,6 +269,20 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
     @Override
     public void onBackPressed() {
+        terminateRecord();
+        super.onBackPressed();
+        overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_down_translate);
+    }
+
+    public void terminateRecord() {
+
+        mCountDownTimer.setTimerCallback(null);
+        mCountDownTimer.stopTimer();
+        mRecordSequenceTimer.setTimerCallback(null);
+        mRecordSequenceTimer.stopTimer();
+        mSoundManager.stopAll();
+        if(mRecord != null)
+            mRecord.delete();
         try {
             if (mCameraFragment.isRecording()) {
                 mCameraFragment.setRecordCallback(null);
@@ -274,11 +292,10 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 mCurrentVideoPath.delete();
 
         } catch (IOException e) {
-            Log.d(TAG, "recordVideo", e);
+            Log.d(TAG, "terminateRecord", e);
         } catch (Exception e) {
-            Log.d(TAG, "recordVideo", e);
+            Log.d(TAG, "terminateRecord", e);
         }
-        super.onBackPressed();
     }
 
     Timer.TimerCallback mCountDownCallback = new Timer.TimerCallback() {

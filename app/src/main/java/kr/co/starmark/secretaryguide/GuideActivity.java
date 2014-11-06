@@ -120,6 +120,7 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
         intent.putExtra("type", mPager.getCurrentItem() + 1);
         startActivity(intent);
+        overridePendingTransition(R.anim.activity_open_up_translate,R.anim.activity_close_scale);
     }
 
     private Uri getGuideVideoUri(){
