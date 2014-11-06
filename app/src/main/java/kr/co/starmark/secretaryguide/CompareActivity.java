@@ -3,6 +3,7 @@ package kr.co.starmark.secretaryguide;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.graphics.Point;
 import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -11,7 +12,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,9 +58,12 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     SeekBar mSeekBar;
 
     @InjectView(R.id.play)
-    Button mToolbarPlay;
+    ImageButton mToolbarPlay;
     @InjectView(R.id.controller)
     LinearLayout mController;
+
+    @InjectView(R.id.current_time)
+    TextView mCurrentTime;
     @InjectView(R.id.duration)
     TextView mDuration;
 
@@ -65,16 +71,16 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compare);
+
         setActionBar();
         ButterKnife.inject(this);
 
         mLeft.setVisibility(View.VISIBLE);
         mLeft.setImageResource(R.drawable.icon_back);
         mRight.setVisibility(View.GONE);
-        mTitle.setText("비교하기");
+        mTitle.setText("모델과 비교");
 
         GreetingVideo video = getIntent().getParcelableExtra("record");
 
@@ -85,6 +91,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         mRight.setVisibility(View.GONE);
         mGreeting1.setText(title);
         mRight.setEnabled(true);
+
         mLeftVideo.setVideoURI(getVideoUri(video.type, video.side));
         mLeftVideo.requestFocus();
 
@@ -100,6 +107,8 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         mLeftVideo.setOnPreparedListener(this);
 
         mSeekBar.setOnSeekBarChangeListener(this);
+
+
     }
 
     @Override
@@ -176,8 +185,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         mediaPlayer.seekTo(0);
         int duration = mLeftVideo.getDuration();
         mSeekBar.setMax(duration);
-
-//        Log.d(TAG, String.format("duration:%d,%d", duration, mSeekBar.getMax()));
+        mDuration.setText(DateFormat.format("m:ss", duration));
     }
 
     public void play() {
@@ -187,15 +195,14 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         mV1IsPlaying = true;
         mV2IsPlaying = true;
         mPlay.setVisibility(View.INVISIBLE);
-        mToolbarPlay.setText("pause");
+        mToolbarPlay.setImageResource(R.drawable.btn_pause);
         stopSeekerThread();
         mThread = new SeekerThread();
         mThread.start();
 
     }
 
-    private void stopSeekerThread()
-    {
+    private void stopSeekerThread() {
         if (mThread != null && mThread.isAlive()) {
             mThread.stopThread();
             try {
@@ -220,7 +227,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         } else if (mPlayStatement == PLAY) {
             mPlayStatement = PAUSE;
             mPlay.setVisibility(View.VISIBLE);
-            mToolbarPlay.setText("play");
+            mToolbarPlay.setImageResource(R.drawable.btn_play);
             mLeftVideo.pause();
             mRightVideo.pause();
         }
@@ -231,7 +238,6 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         if (b) {
             mLeftVideo.seekTo(i);
             mRightVideo.seekTo(i);
-            Log.d(TAG, String.format("seek:%d", i));
         }
     }
 
@@ -247,8 +253,8 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
 
     class SeekerThread extends Thread {
         boolean run = true;
-        public void stopThread()
-        {
+
+        public void stopThread() {
             run = false;
         }
 
@@ -259,18 +265,11 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
                 try {
                     Thread.sleep(50);
                     updateSeekerPosition();
-//                    mLeftVideo.getCurrentPosition();
-//                    Message msg = Message.obtain();
-//
-//                    msg.arg1 = mLeftVideo.getCurrentPosition();
-//                    mHandler.sendMessage(msg);
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }
-
     }
 
     private void updateSeekerPosition() {
@@ -278,17 +277,8 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
             @Override
             public void run() {
                 mSeekBar.setProgress(mLeftVideo.getCurrentPosition());
-                mDuration.setText(DateFormat.format("m:ss", mLeftVideo.getCurrentPosition()) + " / " + DateFormat.format("m:ss", mLeftVideo.getDuration()));
+                mCurrentTime.setText(DateFormat.format("m:ss", mLeftVideo.getCurrentPosition()));
             }
         });
     }
-
-//    Handler mHandler = new Handler() {
-//        @Override
-//        public void handleMessage(Message msg) {
-//            int currentPosition = msg.arg1;
-//            mSeekBar.setProgress(currentPosition);
-//            mDuration.setText(DateFormat.format("m:ss", currentPosition) + " / " + DateFormat.format("m:ss", mLeftVideo.getDuration()));
-//        }
-//    };
 }
