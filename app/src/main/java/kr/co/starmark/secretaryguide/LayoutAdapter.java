@@ -44,6 +44,8 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
         @InjectView(R.id.delete_check)
         ImageView mDeleteIcon;
 
+        AsyncTask<String, Void, Bitmap> mThumbnailTask = null;
+
         VideoRecordItem(View view) {
             super(view);
             ButterKnife.inject(this, view);
@@ -86,7 +88,11 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
             mFaceSideIcon.setImageResource(getfaceSideDrawableId(item.side));
             mTypeIcon.setImageResource(getGreetingTypeIcon(item.type));
             mDate.setText(item.date);
-            new AsyncTask<String, Void, Bitmap>() {
+            if(mThumbnailTask != null)
+                mThumbnailTask.cancel(true);
+
+            mThumbnail.setImageResource(android.R.drawable.ic_menu_rotate);
+            mThumbnailTask = new AsyncTask<String, Void, Bitmap>() {
                 @Override
                 protected Bitmap doInBackground(String... path) {
                     return ThumbnailUtils.createVideoThumbnail(path[0], MediaStore.Images.Thumbnails.MINI_KIND);
@@ -96,7 +102,8 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
                 protected void onPostExecute(Bitmap bitmap) {
                     mThumbnail.setImageBitmap(bitmap);
                 }
-            }.execute(item.path);
+            };
+            mThumbnailTask.execute(item.path);
         }
 
         private int getfaceSideDrawableId(int side) {
