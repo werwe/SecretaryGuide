@@ -25,7 +25,7 @@
 
         <activity
             android:name="kr.co.starmark.secretaryguide.SplashActivity"
-            android:label="@string/title_activity_splash"
+            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.NoActionBar">
             <intent-filter>
