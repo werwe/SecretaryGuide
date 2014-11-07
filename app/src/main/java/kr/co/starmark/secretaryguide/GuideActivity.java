@@ -132,11 +132,7 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
     }
 
     @Override
-    public void onPageScrolled(int i, float v, int i2) {
-        if (i == 1) {
-            Log.d(TAG, String.format("i:%d,v:%f,i2:%d", i, v, i2));
-        }
-    }
+    public void onPageScrolled(int i, float v, int i2) { }
 
     @Override
     public void onPageSelected(int i) {

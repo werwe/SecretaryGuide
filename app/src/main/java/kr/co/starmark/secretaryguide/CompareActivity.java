@@ -2,20 +2,11 @@ package kr.co.starmark.secretaryguide;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.FragmentTransaction;
-import android.graphics.Point;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.format.DateFormat;
-import android.util.Log;
-import android.view.Display;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -35,15 +26,22 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     public static final int STOP = 3;
     private static final String TAG = CompareActivity.class.getName();
 
+    private int ICONS[] = {
+            R.drawable.title_icon_00,
+            R.drawable.title_icon_01,
+            R.drawable.title_icon_02,
+            R.drawable.title_icon_04,
+            R.drawable.title_icon_03
+    };
+
+    private static final String[] TITLES = {"  가벼운 인사", "  보통 인사", "  정중한 인사"};
+
     @InjectView(R.id.left)
     ImageButton mLeft;
     @InjectView(R.id.title)
     TextView mTitle;
     @InjectView(R.id.right)
     ImageButton mRight;
-
-    @InjectView(R.id.face_explain)
-    TextView mGreeting1;
 
     @InjectView(R.id.leftVideo)
     VideoView mLeftVideo;
@@ -66,6 +64,12 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     TextView mCurrentTime;
     @InjectView(R.id.duration)
     TextView mDuration;
+    @InjectView(R.id.greeting_type_icon)
+    ImageView mGreetingTypeIcon;
+    @InjectView(R.id.greeting_type)
+    TextView mGreetingType;
+    @InjectView(R.id.date_time)
+    TextView mDateTime;
 
     private int mPlayStatement = STOP;
 
@@ -73,7 +77,6 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compare);
-
         setActionBar();
         ButterKnife.inject(this);
 
@@ -82,14 +85,15 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
         mRight.setVisibility(View.GONE);
         mTitle.setText("모델과 비교");
 
-        GreetingVideo video = getIntent().getParcelableExtra("record");
 
+        GreetingVideo video = getIntent().getParcelableExtra("record");
+        mGreetingTypeIcon.setImageResource(ICONS[video.type-1]);
+        mGreetingType.setText(TITLES[video.type-1]);
+        mDateTime.setText(video.date);
         video.log();
 
-        String title = getGreetingType(video.type) + " - " + getfaceSide(video.side);
         mTitle.setText("Secretary Guide");
         mRight.setVisibility(View.GONE);
-        mGreeting1.setText(title);
         mRight.setEnabled(true);
 
         mLeftVideo.setVideoURI(getVideoUri(video.type, video.side));
@@ -120,7 +124,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.activity_open_scale,R.anim.activity_close_translate);
+        overridePendingTransition(R.anim.activity_open_scale, R.anim.activity_close_translate);
     }
 
     private String getfaceSide(int side) {
@@ -170,6 +174,7 @@ public class CompareActivity extends Activity implements MediaPlayer.OnPreparedL
             mV1IsPlaying = false;
             if (!mV2IsPlaying) {
                 mPlay.setVisibility(View.VISIBLE);
+                mToolbarPlay.setImageResource(R.drawable.btn_play);
                 stopSeekerThread();
             }
         }

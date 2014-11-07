@@ -5,22 +5,35 @@
     tools:context=".CompareActivity">
     <!--android:background="@android:color/black"-->
 
-    <TextView
-        android:id="@+id/face_explain"
-        android:layout_width="match_parent"
-        android:layout_height="49dp"
+    <LinearLayout
+        android:id="@+id/title_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:background="@drawable/tab_background"
+        android:gravity="center">
 
-        android:gravity="center"
-        android:text="가벼운 인사"
-        android:textColor="@color/base"
-        android:textSize="26dp" />
-    />
+        <ImageView
+            android:id="@+id/greeting_type_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/title_icon_00" />
+
+        <TextView
+            android:id="@+id/greeting_type"
+            android:layout_width="wrap_content"
+            android:layout_height="49dp"
+            android:layout_marginLeft="4dp"
+            android:gravity="center"
+            android:text="가벼운 인사"
+            android:textColor="@color/base_dark"
+            android:textSize="20dp" />
+        />
+    </LinearLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/face_explain"
+        android:layout_below="@id/title_container"
         android:background="@drawable/compare_background">
 
         <RelativeLayout
@@ -42,13 +55,29 @@
                 android:layout_centerInParent="true"
                 android:src="@drawable/line_compare_text_split" />
 
-            <ImageView
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_toRightOf="@id/spliter"
-                android:scaleType="center"
-                android:src="@drawable/text_recorded_video" />
+                android:orientation="vertical">
 
+                <ImageView
+                    android:id="@+id/subtitle2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/text_recorded_video" />
+
+                <TextView
+                    android:id="@+id/date_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/subtitle2"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="4dp"
+                    android:text="2014.11.07 10:14:13"
+                    android:textColor="@android:color/white" />
+            </RelativeLayout>
         </RelativeLayout>
 
 
@@ -58,9 +87,9 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/compare_video_title"
             android:layout_gravity="center"
-            android:padding="4dp"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="4dp">
 
             <FrameLayout
 
@@ -88,69 +117,68 @@
         </LinearLayout>
 
         <ImageView
+            style="@android:style/Widget.Holo.Button.Borderless"
             android:id="@+id/btn_play"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignBottom="@id/video_frame"
             android:layout_alignLeft="@id/video_frame"
             android:layout_alignRight="@id/video_frame"
             android:layout_alignTop="@id/video_frame"
-            android:layout_alignBottom="@id/video_frame"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="center"
             android:layout_gravity="center"
+            android:scaleType="center"
             android:src="@drawable/play_btn" />
 
         <LinearLayout
-            android:background="@drawable/play_control_background"
             android:id="@+id/controller"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/video_frame"
+            android:background="@drawable/play_control_background"
             android:orientation="horizontal">
 
             <ImageButton
-                style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
-                android:layout_gravity="center_vertical"
                 android:id="@+id/play"
+                style="@android:style/Widget.Holo.Light.Button.Borderless.Small"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/btn_play"
                 android:text="play" />
 
             <TextView
                 android:id="@+id/current_time"
-                android:layout_gravity="center_vertical"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="8dp"
-                android:textSize="18dp"
+                android:text="0:00"
                 android:textColor="@android:color/white"
-                android:text="0:00" />
+                android:textSize="18dp" />
 
             <SeekBar
-                android:layout_marginLeft="8dp"
-                android:layout_marginRight="8dp"
-                android:thumb="@drawable/seeker_thumb"
                 android:id="@+id/seek_bar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/controller"
                 android:layout_gravity="center_vertical"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
                 android:layout_weight="1"
-                android:indeterminate="false" />
+                android:indeterminate="false"
+                android:thumb="@drawable/seeker_thumb" />
 
             <TextView
-                android:layout_gravity="center_vertical"
                 android:id="@+id/duration"
-                android:textSize="18dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
                 android:layout_marginLeft="4dp"
+                android:layout_marginRight="16dp"
+                android:text="0:00"
                 android:textColor="@android:color/white"
-                android:layout_marginRight="4dp"
-                android:text="0:00" />
+                android:textSize="18dp" />
         </LinearLayout>
     </RelativeLayout>
-
-
 </RelativeLayout>
