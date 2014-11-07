@@ -45,8 +45,8 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
             R.drawable.title_icon_00,
             R.drawable.title_icon_01,
             R.drawable.title_icon_02,
-            R.drawable.title_icon_03,
-            R.drawable.title_icon_04
+            R.drawable.title_icon_04,
+            R.drawable.title_icon_03
     };
 
     private static final String[] TITLES = {"  가벼운 인사", "  보통 인사", "  정중한 인사", "  전화 예절", "  내방객 응대"};
@@ -123,8 +123,8 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         overridePendingTransition(R.anim.activity_open_up_translate,R.anim.activity_close_scale);
     }
 
-    private Uri getGuideVideoUri(){
-        return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_guide");
+    private Uri getGuideVideoUri(int i){
+        return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_guide_"+i);
     }
 
     private Uri getVideoUri(int type, int side) {
@@ -182,11 +182,15 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
             if (position < 3) {
                 return PageFragment.create(
                         new Uri[]{
-                                getGuideVideoUri()
+                                getGuideVideoUri(0)
                         }
                 );
             }
-            return PageFragment.create(new Uri[]{getGuideVideoUri()});
+            if(position == 3)
+                return PageFragment.create(new Uri[]{getGuideVideoUri(1)});
+            if(position == 4)
+                return PageFragment.create(new Uri[]{getGuideVideoUri(2)});
+            return  null;
         }
 
         public CharSequence getPageTitle(int position) {
@@ -324,7 +328,6 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         }
 
         public void removeVideoView() {
-            Log.d(TAG, "removeVideoView");
             if (mVideo != null)
                 mVideo.stopPlayback();
 
