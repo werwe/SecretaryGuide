@@ -126,7 +126,6 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_record);
 
-
         mGreetingType = getIntent().getIntExtra("type", 1);
         mCameraFragment = CameraFragment.newInstance();
         mCameraFragment.setRecordCallback(this);
@@ -169,7 +168,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
     public void recordStartImmediatly()
     {
         resetSequeceHead();
-        mRecordSequenceTimer.startTimer(8);
+        mRecordSequenceTimer.startTimer(12);
         hideTimerLayout();
     }
 
@@ -328,7 +327,7 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
                 @Override
                 public void run() {
                     mTimerText.setVisibility(View.INVISIBLE);
-                    mRecordSequenceTimer.startTimer(10);
+                    mRecordSequenceTimer.startTimer(12);
                 }
             });
         }
@@ -340,15 +339,20 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Action action = mGreetingSequence.head();
-                    if (action == null)
-                        return;
-                    if (seconds == action.getTiming()) {
-                        action.action();
-                        mGreetingSequence.next();
-                    }
+                    readAction(seconds);
                 }
             });
+        }
+
+        public void readAction(int seconds) {
+            Action action = mGreetingSequence.head();
+            if (action == null)
+                return;
+            if (seconds == action.getTiming()) {
+                action.action();
+                mGreetingSequence.next();
+                readAction(seconds);
+            }
         }
 
         @Override
@@ -405,12 +409,14 @@ public class RecordActivity extends Activity implements CameraFragment.RecordCal
 
     private void initSequence() {
         mGreetingSequence = new Sequence();
-        mGreetingSequence.add(new RecordAction(0));
-        mGreetingSequence.add(new ShowNotiTextAction(1));
-        mGreetingSequence.add(new SoundAction(2, mSoundManager,R.raw.audio_greeing_start));
-        mGreetingSequence.add(new RemoveNotiTextAction(4));
-        mGreetingSequence.add(new RecordStopAction(7));
-        mGreetingSequence.add(new SoundAction(8, mSoundManager,R.raw.audio_greeting_end));
+        mGreetingSequence.add(new ShowNotiTextAction(0));
+        mGreetingSequence.add(new SoundAction(0, mSoundManager,R.raw.audio_greeing_start));
+        mGreetingSequence.add(new RemoveNotiTextAction(2));
+        mGreetingSequence.add(new RecordAction(2));
+
+
+        mGreetingSequence.add(new RecordStopAction(3+8));
+        mGreetingSequence.add(new SoundAction(3+9, mSoundManager,R.raw.audio_greeting_end));
     }
 
     private void resetSequeceHead()
