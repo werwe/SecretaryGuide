@@ -1,13 +1,13 @@
 package kr.co.starmark.secretaryguide;
 
+import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,7 +22,11 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.view.ViewTreeObserver;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.melnykov.fab.FloatingActionButton;
@@ -40,6 +44,10 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
     final Logger logger = LoggerFactory.getLogger(GuideActivity.class);
     public static final String TAG = "RecordActivity";
+    @InjectView(R.id.explain_action)
+    TextView mExplainAction;
+    @InjectView(R.id.floating_btn_container)
+    RelativeLayout mFloatingBtnContainer;
 
     private int ICONS[] = {
             R.drawable.title_icon_00,
@@ -84,7 +92,21 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         mPagerHeader.setTabIndicatorColor(getResources().getColor(R.color.base));
         mPagerHeader.setTextSpacing(10);
         mPagerHeader.setNonPrimaryAlpha(0.3f);
-        mPagerHeader.setTextColor(Color.argb(255,10,89,152));
+        mPagerHeader.setTextColor(Color.argb(255, 10, 89, 152));
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mExplainAction.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mExplainAction.animate().cancel();
+                mExplainAction.animate().alpha(0).setDuration(300).start();
+            }
+        }, 2000);
+
     }
 
     private void setActionBar() {
@@ -109,22 +131,22 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
     public void onActionBarRight() {
         Intent intent = new Intent(getApplicationContext(), AlbumActivity.class);
         startActivity(intent);
-        overridePendingTransition(R.anim.activity_open_translate,R.anim.activity_close_scale);
+        overridePendingTransition(R.anim.activity_open_translate, R.anim.activity_close_scale);
     }
 
     @OnClick(R.id.start_video_recorder)
     public void onVideoRecoderStart() {
-        if(mPager.getCurrentItem() > 2)
+        if (mPager.getCurrentItem() > 2)
             return;
 
         Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
         intent.putExtra("type", mPager.getCurrentItem() + 1);
         startActivity(intent);
-        overridePendingTransition(R.anim.activity_open_up_translate,R.anim.activity_close_scale);
+        overridePendingTransition(R.anim.activity_open_up_translate, R.anim.activity_close_scale);
     }
 
-    private Uri getGuideVideoUri(int i){
-        return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_guide_"+i);
+    private Uri getGuideVideoUri(int i) {
+        return Uri.parse("android.resource://" + getPackageName() + "/raw/greeting_guide_" + i);
     }
 
     private Uri getVideoUri(int type, int side) {
@@ -132,7 +154,12 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
     }
 
     @Override
-    public void onPageScrolled(int i, float v, int i2) { }
+    public void onPageScrolled(int i, float v, int i2) {
+        if(i == 2)
+            mFloatingBtnContainer.setX(-i2);
+        if(i == 3)
+            mFloatingBtnContainer.setX(-mPager.getWidth());
+    }
 
     @Override
     public void onPageSelected(int i) {
@@ -143,18 +170,33 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
                 fragment.removeVideoView();
             }
         }
-        if (i > 2)
-            mStartVideoRecorder.hide(true);
-        else
-            mStartVideoRecorder.show(true);
 
-        if(i < 3)
+        if (i < 3) {
             mTitle.setText("인사 예절");
-        else if(i == 3 )
+            mExplainAction.setText(TITLES[i] + " 촬영하기");
+            mExplainAction.animate().cancel();
+            mExplainAction.animate().alpha(1).setDuration(300).start();
+            mExplainAction.removeCallbacks(mHideActionHint);
+            mExplainAction.getHandler().postDelayed(mHideActionHint, 2000);
+
+        } else if (i == 3) {
             mTitle.setText("전화 예절");
-        else if(i == 4)
+            mExplainAction.animate().cancel();
+            mExplainAction.animate().alpha(0).setDuration(300).start();
+        } else if (i == 4) {
             mTitle.setText("내방객 응대");
-   }
+            mExplainAction.animate().cancel();
+            mExplainAction.animate().alpha(0).setDuration(300).start();
+        }
+    }
+
+    Runnable mHideActionHint = new Runnable() {
+        @Override
+        public void run() {
+            mExplainAction.animate().cancel();
+            mExplainAction.animate().alpha(0).setDuration(300).start();
+        }
+    };
 
     @Override
     public void onPageScrollStateChanged(int i) {
@@ -174,19 +216,19 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         }
 
         @Override
-        public Fragment getItem(int position) {
+        public Fragment getItem(final int position) {
             if (position < 3) {
                 return PageFragment.create(
                         new Uri[]{
                                 getGuideVideoUri(0)
-                        }
+                        }, position
                 );
             }
-            if(position == 3)
-                return PageFragment.create(new Uri[]{getGuideVideoUri(1)});
-            if(position == 4)
-                return PageFragment.create(new Uri[]{getGuideVideoUri(2)});
-            return  null;
+            if (position == 3)
+                return PageFragment.create(new Uri[]{getGuideVideoUri(1)}, position);
+            if (position == 4)
+                return PageFragment.create(new Uri[]{getGuideVideoUri(2)}, position);
+            return null;
         }
 
         public CharSequence getPageTitle(int position) {
@@ -218,12 +260,14 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         VideoView mVideo;
 
         private int mCnt = 0;
+        private int mPageNumber;
 
-        public static PageFragment create(Uri[] videos) {
+        public static PageFragment create(Uri[] videos, int pageNumber) {
             Bundle args = new Bundle();
             args.putParcelableArray(VIDEOS, videos);
             PageFragment fragment = new PageFragment();
             fragment.setArguments(args);
+            fragment.mPageNumber = pageNumber;
             return fragment;
         }
 
@@ -242,11 +286,14 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
             return view;
         }
 
+        @TargetApi(Build.VERSION_CODES.KITKAT)
         private void loadPreview() {
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(getActivity().getApplicationContext(), mVideoUris[0]);
-            Bitmap b = retriever.getFrameAtTime();
-            mPreview.setImageBitmap(b);
+            if (mPageNumber < 3)
+                mPreview.setImageResource(R.drawable.video_preview1);
+            else if (mPageNumber == 3)
+                mPreview.setImageResource(R.drawable.video_preview2);
+            else if (mPageNumber == 4)
+                mPreview.setImageResource(R.drawable.video_preview3);
         }
 
         private void addVideoView() {

@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context=".RecordActivity">
-
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
@@ -21,17 +20,36 @@
             android:textSize="16dp" />
     </android.support.v4.view.ViewPager>
 
-    <com.melnykov.fab.FloatingActionButton
-        android:id="@+id/start_video_recorder"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/floating_btn_container"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="16dp"
-        android:layout_marginBottom="32dp"
-        android:src="@drawable/record_icon_small"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        fab:fab_colorNormal="#dd191d"
-        fab:fab_colorPressed="#f36c60"/>
+        android:layout_marginBottom="48dp"
+        android:layout_marginRight="16dp">
+
+
+        <TextView
+            android:id="@+id/explain_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_rect"
+            android:gravity="center"
+            android:layout_marginRight="8dp"
+            android:layout_centerVertical="true"
+            android:text="가벼운 인사촬영"
+            android:layout_toLeftOf="@+id/start_video_recorder"
+            android:textColor="@android:color/black" />
+
+        <com.melnykov.fab.FloatingActionButton
+            android:id="@+id/start_video_recorder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/record_icon_small"
+            fab:fab_colorNormal="#2196f3"
+            fab:fab_colorPressed="#64b5f6" />
+    </RelativeLayout>
 
 </RelativeLayout>
