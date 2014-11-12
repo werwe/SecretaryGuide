@@ -4,12 +4,11 @@
     android:layout_height="match_parent"
     tools:context="kr.co.starmark.secretaryguide.ReplayActivity">
 
-    <VideoView
-        android:layout_centerInParent="true"
-        android:id="@+id/video"
+    <FrameLayout
+        android:id="@id/video_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+    </FrameLayout>
 
-    <include
-        layout="@layout/after_menu" />
+    <include layout="@layout/after_menu" />
 </RelativeLayout>

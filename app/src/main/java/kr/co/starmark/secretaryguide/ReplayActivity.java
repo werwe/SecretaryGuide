@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.*;
+import android.widget.VideoView;
 
 import java.io.File;
 
@@ -18,7 +19,7 @@ import butterknife.OnClick;
 public class ReplayActivity extends Activity {
 
     GreetingVideo mVideoRecord;
-    @InjectView(R.id.video)
+
     android.widget.VideoView mVideo;
     @InjectView(R.id.btn_replay)
     ImageButton mReplay;
@@ -28,6 +29,8 @@ public class ReplayActivity extends Activity {
     ImageButton mRetake;
     @InjectView(R.id.menu_container)
     RelativeLayout mMenuContainer;
+    @InjectView(R.id.video_frame)
+    FrameLayout mVideoFrame;
     private int mGreetingType = 1;
 
     @Override
@@ -35,10 +38,20 @@ public class ReplayActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_replay);
         ButterKnife.inject(this);
+        addVideoView();
         mGreetingType = getIntent().getIntExtra("type", 1);
         mVideoRecord = getIntent().getParcelableExtra("record");
         mMenuContainer.setVisibility(View.GONE);
         replay();
+    }
+
+    private void addVideoView() {
+        mVideo = new VideoView(this);
+        mVideoFrame.addView(mVideo);
+    }
+
+    private void removeVideoView(){
+        mVideoFrame.removeView(mVideo);
     }
 
     @OnClick(R.id.btn_replay)
@@ -57,6 +70,8 @@ public class ReplayActivity extends Activity {
 
     @OnClick(R.id.btn_compare)
     public void compare() {
+
+        removeVideoView();
         Intent intent = new Intent(getApplicationContext(), CompareActivity.class);
         intent.putExtra("record", mVideoRecord);
         startActivity(intent);
@@ -70,7 +85,7 @@ public class ReplayActivity extends Activity {
         if (f.exists()) {
             f.delete();
         }
-        Intent intent = new Intent(getApplicationContext(),RecordActivity.class);
+        Intent intent = new Intent(getApplicationContext(), RecordActivity.class);
         intent.putExtra("type", mGreetingType);
         startActivity(intent);
         finish();
