@@ -77,6 +77,7 @@ public class AlbumActivity extends Activity {
         setRecyclerView();
         mRecyclerView.setHasFixedSize(true);
         queryData();
+
     }
 
     private void setActionBar() {
@@ -142,6 +143,8 @@ public class AlbumActivity extends Activity {
                 return false;
             }
         });
+
+
     }
 
     private void switchMode(int mode) {
@@ -238,6 +241,7 @@ public class AlbumActivity extends Activity {
                 if (mRecords == null || mRecords.isEmpty()) ; //비어있는 화면
                 mAdapter = new LayoutAdapter(AlbumActivity.this, mRecyclerView, mRecords);
                 mRecyclerView.setAdapter(mAdapter);
+                mAdapter.setSelection(selection);
             }
         }.execute();
     }

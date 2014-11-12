@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.lucasr.twowayview.ItemSelectionSupport;
 import org.lucasr.twowayview.widget.TwoWayView;
 
 import java.util.List;
@@ -25,6 +26,12 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
     private final TwoWayView mRecyclerView;
     private List<GreetingVideo> mRecords;
     private int mCurrentItemId = 0;
+
+    private ItemSelectionSupport selection;
+
+    public void setSelection(ItemSelectionSupport selection) {
+        this.selection = selection;
+    }
 
     public static class VideoRecordItem extends RecyclerView.ViewHolder {
 
@@ -45,6 +52,8 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
         ImageView mDeleteIcon;
 
         AsyncTask<String, Void, Bitmap> mThumbnailTask = null;
+
+
 
         VideoRecordItem(View view) {
             super(view);
@@ -104,6 +113,7 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
                 }
             };
             mThumbnailTask.execute(item.path);
+            mDeleteIcon.setVisibility(View.INVISIBLE);
         }
 
         private int getfaceSideDrawableId(int side) {
@@ -138,6 +148,10 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
                     return R.drawable.album_icon_type_02;
             }
             return R.drawable.album_icon_type_00;
+        }
+
+        public void check() {
+            mDeleteIcon.setVisibility(View.VISIBLE);
         }
     }
 
@@ -182,5 +196,7 @@ public class LayoutAdapter extends RecyclerView.Adapter<LayoutAdapter.VideoRecor
     @Override
     public void onBindViewHolder(VideoRecordItem holder, int position) {
         holder.setItem(getItem(position));
+        if (selection.isItemChecked(position))
+            holder.check();
     }
 }
