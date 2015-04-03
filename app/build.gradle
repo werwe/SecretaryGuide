@@ -9,6 +9,7 @@ repositories {
         url "https://oss.sonatype.org/content/repositories/snapshots/"
     }
 }
+
 android {
     compileSdkVersion 21
     buildToolsVersion "21.0.2"
@@ -20,9 +21,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
     buildTypes {
         release {
-            runProguard false
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

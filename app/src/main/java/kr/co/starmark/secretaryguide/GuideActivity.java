@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -85,6 +86,8 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_guide);
         setActionBar();
         ButterKnife.inject(this);
+
+        mLeft.setImageResource(R.drawable.btn_video_guide);
         mPagerAdapter = new SampleFragmentPagerAdapter();
         mPager.setAdapter(mPagerAdapter);
         mPager.setOnPageChangeListener(this);
@@ -124,7 +127,8 @@ public class GuideActivity extends FragmentActivity implements ViewPager.OnPageC
 
     @OnClick(R.id.left)
     public void onActionBarLeft() {
-        logger.debug("actionbar left button");
+        Intent intent = new Intent(getApplicationContext(), GuideVideoActivity.class);
+        startActivity(intent);
     }
 
     @OnClick(R.id.right)

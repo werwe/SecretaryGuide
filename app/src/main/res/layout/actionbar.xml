@@ -13,6 +13,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true" />
+    <!--<Button-->
+        <!--android:id="@+id/guide_video"-->
+        <!--android:visibility="gone"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:gravity="center"-->
+        <!--style="@android:style/Widget.Holo.Button.Borderless"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="영상\n가이드"-->
+        <!--android:textStyle="bold"-->
+        <!--android:textSize="15dp"-->
+        <!--/>-->
 
     <TextView
         android:id="@+id/title"
